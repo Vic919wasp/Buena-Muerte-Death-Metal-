@@ -301,7 +301,7 @@ function initSparkles() {
       }
       var progress = p.life / p.maxLife;
       var fade = progress < 0.3 ? progress / 0.3 : progress > 0.7 ? (1 - progress) / 0.3 : 1;
-      p.alpha = fade * 0.35;
+      p.alpha = fade * 0.7;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       if (p.hue) {
