@@ -242,17 +242,29 @@ function initShareButtons() {
 /* ============================================================
    Inicialización global
    ============================================================ */
-// Video inline play
+// Video inline play — solo uno a la vez
+var currentVideoPlayer = null;
+var currentVideoThumb = null;
+
 function initVideoInline() {
   document.querySelectorAll('.video-thumb[data-video]').forEach(function (el) {
     if (el.dataset.bound) return;
     el.dataset.bound = '1';
     el.addEventListener('click', function () {
       var videoId = el.dataset.video;
+      // Si hay otro video reproduciéndose, quitarlo
+      if (currentVideoPlayer) {
+        currentVideoPlayer.remove();
+        if (currentVideoThumb) currentVideoThumb.style.display = '';
+      }
+      // Crear nuevo player inline
       var player = document.createElement('div');
       player.className = 'video-inline-player';
       player.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-      el.replaceWith(player);
+      el.style.display = 'none';
+      el.parentNode.insertBefore(player, el.nextSibling);
+      currentVideoPlayer = player;
+      currentVideoThumb = el;
     });
     el.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') {
