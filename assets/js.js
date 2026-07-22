@@ -301,11 +301,12 @@ function initFog() {
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var patches = [];
-  var MAX = 6;
+  var MAX = window.innerWidth <= 880 ? 3 : 6;
 
   function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    MAX = window.innerWidth <= 880 ? 3 : 6;
   }
   resize();
   window.addEventListener('resize', resize);
@@ -357,6 +358,39 @@ function initFog() {
   draw();
 }
 
+/* ============================================================
+   [10] Nav scroll infinito mobile + touch
+   ============================================================ */
+function initNavScroll() {
+  var track = document.querySelector('.nav-track');
+  if (!track) return;
+  var html = track.innerHTML;
+  track.innerHTML = html + html;
+
+  var isMobile = function () { return window.innerWidth <= 880; };
+  var startX = 0, scrolling = false;
+
+  track.addEventListener('touchstart', function (e) {
+    if (!isMobile()) return;
+    scrolling = true;
+    startX = e.touches[0].pageX;
+    track.style.animationPlayState = 'paused';
+  }, { passive: true });
+
+  track.addEventListener('touchmove', function (e) {
+    if (!scrolling) return;
+    var x = e.touches[0].pageX;
+    var diff = startX - x;
+    track.scrollLeft += diff;
+    startX = x;
+  }, { passive: true });
+
+  track.addEventListener('touchend', function () {
+    scrolling = false;
+    track.style.animationPlayState = '';
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   initNav();
   initActiveLink();
@@ -369,6 +403,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initVideoModal();
   initFog();
   initShareButtons();
+  initNavScroll();
 
   // Visit counter
   var counterEl = document.getElementById('visitCounter');

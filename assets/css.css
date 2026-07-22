@@ -162,6 +162,7 @@ body::before {
 .site-nav__toggle { display: none; }
 
 /* Subnav dropdown estilo Dimmu (Merch / Links) */
+.nav-track { display: contents; }
 .subnav { position: relative; }
 .subnav__panel {
   position: absolute; top: 100%; left: 50%;
@@ -795,33 +796,36 @@ body::before {
 
 /* [14] RESPONSIVE */
 @media (max-width: 880px) {
-  .site-header__row { grid-template-columns: auto auto; gap: 1rem; }
+  .site-header__row { grid-template-columns: 1fr auto; gap: .5rem; }
+  .site-header__logo { flex-shrink: 0; }
   .site-nav {
-    position: fixed;
-    top: 0; right: 0; bottom: 0;
-    width: 260px;
-    background: var(--negro-2);
-    border-left: 1px solid var(--linea);
-    flex-direction: column;
-    padding: 5rem 1.5rem;
-    transform: translateX(260px);
-    transition: transform .3s ease;
-    z-index: 70;
-    gap: 1rem;
+    position: relative; top: auto; right: auto; bottom: auto;
+    width: 100%; order: 3;
+    background: none; border: none;
+    flex-direction: row; flex-wrap: nowrap;
+    padding: 0; transform: none; transition: none;
+    z-index: auto; gap: 0;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
   }
-  .site-nav.is-open { transform: translateX(0); }
-  .site-nav__toggle {
+  .site-nav.is-open { transform: none; }
+  .site-nav__toggle { display: none; }
+  .site-nav a {
+    flex-shrink: 0;
+    padding: .4rem 1rem;
+    white-space: nowrap;
+  }
+  .nav-track {
     display: flex;
-    align-items: center; justify-content: center;
-    width: 38px; height: 38px;
-    border: 1px solid var(--linea);
-    background: transparent;
-    color: var(--bronce-claro);
-    font-size: 1rem;
-    order: 1;
+    animation: navScroll 18s linear infinite;
+  }
+  .nav-track:hover { animation-play-state: paused; }
+  @keyframes navScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
   .header-cta { display: none; }
-  .site-header__row { grid-template-columns: auto 1fr auto; }
   .lang-selector { display: flex; }
   .disc { grid-template-columns: 1fr; }
   .disc__cover { max-width: 360px; margin: 0 auto; }
