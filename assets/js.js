@@ -144,6 +144,22 @@ function initSpotifyLazy() {
 /* ============================================================
    [08] Newsletter / Contact
    ============================================================ */
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(function () { fallbackCopy(text); });
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+}
 function getSubscribers() {
   try { return JSON.parse(localStorage.getItem('bm_subscribers') || '[]'); }
   catch (e) { return []; }
