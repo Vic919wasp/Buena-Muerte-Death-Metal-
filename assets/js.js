@@ -161,22 +161,64 @@ function initForms() {
 /* ============================================================
    Inicialización global
    ============================================================ */
-// Carousel
+// Carousel + auto-play random
 function initCarousels() {
   document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
+    var track = carousel.querySelector('.carousel__track');
     var slides = carousel.querySelectorAll('.carousel__slide');
     var current = 0;
-    function showSlide(index) {
-      slides[current].classList.remove('is-active');
-      current = (index + slides.length) % slides.length;
-      slides[current].classList.add('is-active');
+    var timer = null;
+    var paused = false;
+
+    function getSlideLeft(index) {
+      return slides[index].offsetLeft - parseInt(getComputedStyle(track).paddingLeft);
     }
-    carousel.querySelector('.carousel__btn--prev').addEventListener('click', function () { showSlide(current - 1); });
-    carousel.querySelector('.carousel__btn--next').addEventListener('click', function () { showSlide(current + 1); });
-    carousel.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowLeft') showSlide(current - 1);
-      if (e.key === 'ArrowRight') showSlide(current + 1);
+
+    function showSlide(index) {
+      current = (index + slides.length) % slides.length;
+      track.scrollTo({ left: getSlideLeft(current), behavior: 'smooth' });
+    }
+
+    function randomDelay() {
+      return 3000 + Math.random() * 5000;
+    }
+
+    function startAuto() {
+      stopAuto();
+      if (!paused) {
+        timer = setTimeout(function () {
+          showSlide(current + 1);
+          startAuto();
+        }, randomDelay());
+      }
+    }
+
+    function stopAuto() {
+      if (timer) { clearTimeout(timer); timer = null; }
+    }
+
+    // Botones manuales
+    carousel.querySelector('.carousel__btn--prev').addEventListener('click', function () {
+      showSlide(current - 1);
+      startAuto();
     });
+    carousel.querySelector('.carousel__btn--next').addEventListener('click', function () {
+      showSlide(current + 1);
+      startAuto();
+    });
+
+    // Teclado
+    carousel.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { showSlide(current - 1); startAuto(); }
+      if (e.key === 'ArrowRight') { showSlide(current + 1); startAuto(); }
+    });
+
+    // Hover pausa
+    carousel.addEventListener('mouseenter', function () { paused = true; stopAuto(); });
+    carousel.addEventListener('mouseleave', function () { paused = false; startAuto(); });
+
+    // Iniciar
+    startAuto();
   });
 }
 
