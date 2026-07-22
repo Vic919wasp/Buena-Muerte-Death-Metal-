@@ -255,14 +255,14 @@ function initVideoModal() {
 }
 
 /* ============================================================
-   [09] Sparkles — destellos sutiles detrás del fondo
+   [09] Fog — niebla borravino sutil cubriendo ~35% del sitio
    ============================================================ */
-function initSparkles() {
+function initFog() {
   var canvas = document.getElementById('sparkles');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
-  var particles = [];
-  var MAX = 12;
+  var patches = [];
+  var MAX = 6;
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -271,45 +271,47 @@ function initSparkles() {
   resize();
   window.addEventListener('resize', resize);
 
-  function createParticle() {
+  function createPatch() {
     return {
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      size: Math.random() * 2.5 + 0.5,
+      radius: Math.random() * 300 + 150,
       alpha: 0,
-      alphaDir: Math.random() * 0.008 + 0.003,
+      targetAlpha: Math.random() * 0.5,
+      alphaSpeed: Math.random() * 0.003 + 0.001,
       life: 0,
-      maxLife: Math.random() * 400 + 200,
-      hue: Math.random() > 0.7 ? 35 : 0
+      maxLife: Math.random() * 600 + 300,
+      driftX: (Math.random() - 0.5) * 0.3,
+      driftY: (Math.random() - 0.5) * 0.15
     };
   }
 
   for (var i = 0; i < MAX; i++) {
-    var p = createParticle();
+    var p = createPatch();
     p.life = Math.random() * p.maxLife;
-    particles.push(p);
+    patches.push(p);
   }
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (var i = 0; i < particles.length; i++) {
-      var p = particles[i];
+    for (var i = 0; i < patches.length; i++) {
+      var p = patches[i];
       p.life++;
+      p.x += p.driftX;
+      p.y += p.driftY;
       if (p.life > p.maxLife) {
-        particles[i] = createParticle();
+        patches[i] = createPatch();
         continue;
       }
       var progress = p.life / p.maxLife;
-      var fade = progress < 0.3 ? progress / 0.3 : progress > 0.7 ? (1 - progress) / 0.3 : 1;
-      p.alpha = fade * 0.7;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      if (p.hue) {
-        ctx.fillStyle = 'rgba(200,170,110,' + p.alpha + ')';
-      } else {
-        ctx.fillStyle = 'rgba(255,255,255,' + p.alpha + ')';
-      }
-      ctx.fill();
+      var fade = progress < 0.2 ? progress / 0.2 : progress > 0.8 ? (1 - progress) / 0.2 : 1;
+      p.alpha = fade * p.targetAlpha;
+      var grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+      grad.addColorStop(0, 'rgba(100,15,25,' + p.alpha + ')');
+      grad.addColorStop(0.5, 'rgba(80,10,20,' + (p.alpha * 0.5) + ')');
+      grad.addColorStop(1, 'rgba(60,5,15,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(p.x - p.radius, p.y - p.radius, p.radius * 2, p.radius * 2);
     }
     requestAnimationFrame(draw);
   }
@@ -325,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initForms();
   initCarousels();
   initVideoModal();
-  initSparkles();
+  initFog();
 
   // Visit counter
   var counterEl = document.getElementById('visitCounter');
