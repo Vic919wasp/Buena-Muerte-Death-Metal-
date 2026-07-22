@@ -241,6 +241,8 @@ body::before {
   display: block;
   margin: 0 auto 1.2rem;
   filter: drop-shadow(0 0 30px rgba(122,24,20,.45));
+  animation: flotar 5s ease-in-out infinite !important;
+  will-change: transform;
 }
 .hero__title {
   font-family: var(--fuente-display);
@@ -298,7 +300,9 @@ body::before {
   color: var(--bronce-claro);
   margin-bottom: 1rem;
   display: block;
+  animation: flotar-card 6s ease-in-out infinite !important;
 }
+
 .section__title {
   font-family: var(--fuente-display);
   font-weight: 700;
@@ -306,6 +310,7 @@ body::before {
   line-height: 1.1;
   letter-spacing: .04em;
   color: var(--hueso);
+  animation: flotar-card 5.5s ease-in-out infinite .3s;
   text-transform: uppercase;
   margin-bottom: 2.5rem;
 }
@@ -344,7 +349,7 @@ body::before {
   padding: 2rem 0;
   border-bottom: 1px solid var(--linea);
   transition: padding .25s;
-  animation: flotar-card 5s ease-in-out infinite;
+  animation: flotar-card 5s ease-in-out infinite !important;
   will-change: transform;
 }
 .news-item:nth-child(2) { animation-delay: .7s; }
@@ -566,7 +571,7 @@ body::before {
 
 /* [09] VIDEO — grid 3 cols + shuffle */
 .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-.video-slide { text-align: center; animation: flotar-card 4.8s ease-in-out infinite; will-change: transform; }
+.video-slide { text-align: center;   animation: flotar-card 4.8s ease-in-out infinite !important; will-change: transform; }
 .video-slide:nth-child(3n+1) { animation-delay: 0s; }
 .video-slide:nth-child(3n+2) { animation-delay: .5s; }
 .video-slide:nth-child(3n+3) { animation-delay: 1s; }
@@ -633,7 +638,7 @@ body::before {
   text-align: center;
   background: rgba(10,12,13,.5);
   transition: border-color .3s;
-  animation: flotar-card 5.5s ease-in-out infinite;
+  animation: flotar-card 5.5s ease-in-out infinite !important;
   will-change: transform;
 }
 .member:nth-child(2) { animation-delay: .8s; }
@@ -703,7 +708,7 @@ body::before {
 }
 @keyframes flotar-card {
   0%, 100% { transform: translateY(0) translateZ(0); }
-  50% { transform: translateY(-10px) translateZ(0); }
+  50% { transform: translateY(-12px) translateZ(0); }
 }
 .newsletter-form { max-width: 580px; margin: 0 auto; text-align: center; }
 .newsletter-form p { font-family: var(--fuente-serif); font-style: italic; color: var(--plata-viva); margin-bottom: 2rem; }
