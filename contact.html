@@ -1,14 +1,12 @@
 <!-- ============================================================
-     CONTEXTO: Página de Contact. Form de contacto (nombre, email,
-               mensaje) + grid de links a redes sociales (Instagram,
-               Facebook, Spotify, Email). El form es data-fake (sin
-               backend): al enviar muestra confirmación + resetea.
+     CONTEXTO: Página de Contact. Botón mailto + grid de links a
+               redes sociales (Instagram, Facebook, Spotify, Email).
      ============================================================
      ÍNDICE DE NAVEGACIÓN
      [001] HEAD / META         - línea 6
      [002] HEADER / NAV        - línea 30
-     [003] CONTACT FORM/LINKS  - línea 55
-     [004] FOOTER              - línea 105
+     [003] CONTACT LINKS       - línea 55
+     [004] FOOTER              - línea 97
      ============================================================ -->
 <!DOCTYPE html>
 <html lang="es-AR">
@@ -54,22 +52,11 @@
     <!-- [003] CONTACT -->
     <div class="contact-grid">
 
-      <form class="contact-form" data-fake>
-        <div>
-          <label for="c-name">Nombre</label>
-          <input type="text" id="c-name" name="name" required>
-        </div>
-        <div>
-          <label for="c-email">Email</label>
-          <input type="email" id="c-email" name="email" required>
-        </div>
-        <div>
-          <label for="c-msg">Mensaje</label>
-          <textarea id="c-msg" name="message" rows="5" required></textarea>
-        </div>
-        <button type="submit">Enviar ›</button>
-        <p class="newsletter-form__note" style="margin-top:1.2rem">[Backend pendiente. El form es demo.]</p>
-      </form>
+      <div class="contact-form">
+        <p style="font-family:var(--fuente-serif);font-size:1.1rem;color:var(--hueso);margin-bottom:1.5rem;">Escribinos directo por email para prensa, contratación o cualquier mensaje.</p>
+        <a href="mailto:favioleguizamon2@gmail.com?subject=Contacto%20-%20Buena%20Muerte" class="btn btn--primary" style="display:inline-block;">Enviar email ›</a>
+        <p style="font-family:var(--fuente-sans);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--bronce);margin-top:1.2rem;">favioleguizamon2@gmail.com</p>
+      </div>
 
       <div class="contact-links">
         <a class="contact-link" href="https://instagram.com/buena.muerte" target="_blank" rel="noopener">
