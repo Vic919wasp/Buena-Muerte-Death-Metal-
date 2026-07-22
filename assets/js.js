@@ -170,13 +170,14 @@ function initCarousels() {
     var timer = null;
     var paused = false;
 
-    function getSlideLeft(index) {
-      return slides[index].offsetLeft - parseInt(getComputedStyle(track).paddingLeft);
+    function getSlideWidth() {
+      return slides[0].offsetWidth + parseInt(getComputedStyle(track).gap);
     }
 
     function showSlide(index) {
       current = (index + slides.length) % slides.length;
-      track.scrollTo({ left: getSlideLeft(current), behavior: 'smooth' });
+      var offset = current * getSlideWidth();
+      track.style.transform = 'translateX(-' + offset + 'px)';
     }
 
     function randomDelay() {
