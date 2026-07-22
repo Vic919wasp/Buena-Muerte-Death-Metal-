@@ -1,0 +1,6 @@
+.opencode/
+imagenes/
+incrementar-visitas.ps1
+*.bak
+.DS_Store
+Thumbs.db

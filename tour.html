@@ -1,0 +1,116 @@
+<!-- ============================================================
+     CONTEXTO: Página de Tour. Estado cero honesto: "no hay fechas
+               confirmadas por ahora" + CTA a Instagram. La tabla
+               `.tour-table` queda lista en el HTML y JS la pobla
+               desde FECHAS[] en assets/js.js. Estructura Dimmu /tour.
+     ============================================================
+     ÍNDICE DE NAVEGACIÓN
+     [001] HEAD / META         - línea 6
+     [002] HEADER / NAV        - línea 30
+     [003] TOUR + SIDEBAR      - línea 53
+     [004] SOUNDCLOUD SIDEBAR  - línea 73
+     [005] FOOTER              - línea 92
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tour — Buena Muerte</title>
+<meta name="description" content="Fechas de Buena Muerte en vivo. Zona Sur, AMBA y festivals.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container site-header__row">
+    <a href="index.html" class="site-header__logo">
+      <img src="assets/buena-muerte-logo.jpeg" alt="Buena Muerte" class="logo-img"><span class="logo-text">Buena <b>Muerte</b></span>
+    </a>
+    <button class="site-nav__toggle" aria-label="Abrir menú">≡</button>
+    <nav class="site-nav" id="siteNav">
+      <a href="index.html">Home</a>
+      <a href="news.html">News</a>
+      <a href="tour.html" class="is-active">Tour</a>
+      <a href="video.html">Video</a>
+      <a href="discography.html">Discography</a>
+      <a href="band.html">Band</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <a href="newsletter.html" class="header-cta">Newsletter</a>
+  </div>
+</header>
+
+<section class="section" id="tour">
+  <div class="container">
+    <span class="section__eyebrow">§ Tour</span>
+    <h1 class="section__title">Fechas en vivo</h1>
+    <p class="section__intro">Shows confirmados de Buena Muerte. Cuando caiga una nueva fecha la subimos acá primero.</p>
+    <span class="section__rule"></span>
+
+    <!-- [003] TOUR + SIDEBAR -->
+    <div class="tour-layout">
+
+      <div class="tour-wrap">
+        <h2 id="tourHeader" style="text-align:center;font-family:var(--fuente-sans);font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--bronce);margin-bottom:2rem">Sin señal por ahora</h2>
+
+        <!-- Estado cero: visible por defecto. JS lo oculta si hay fechas. -->
+        <div class="tour-empty" id="tourEmpty">
+          <p class="tour-empty__big">No hay fechas confirmadas por ahora.<br><b>El silencio también es muerte.</b></p>
+          <p class="tour-empty__sub">Seguinos en <a href="https://instagram.com/buena.muerte" target="_blank" rel="noopener">@buena.muerte</a> para el próximo show.</p>
+        </div>
+
+        <!-- Tabla poblada por assets/js.js desde FECHAS[] -->
+        <table class="tour-table" id="tourTable">
+          <thead><tr><th>Día</th><th>Lugar / Ciudad</th><th></th></tr></thead>
+          <tbody id="tourBody"></tbody>
+        </table>
+      </div>
+
+      <!-- [004] ICARUS MUSIC SIDEBAR -->
+      <aside class="tour-sidebar">
+        <h2 class="tour-sidebar__title">Icarus Music</h2>
+        <div class="tour-sidebar__icarus">
+          <div class="icarus-info">
+            <p class="icarus-info__label">Sello discográfico · Argentina · desde 1997</p>
+            <p class="icarus-info__detail">Buena Muerte apareció en la compilación <em>Icarus Music Edición 2018</em> junto a bandas de la escena metal nacional.</p>
+            <div class="icarus-info__compilation">
+              <span class="icarus-info__tag">Compilación</span>
+              <p>Icarus Music Edición 2018 · CD</p>
+              <p class="icarus-info__track">"Dios es sádico" — Buena Muerte</p>
+            </div>
+            <p class="icarus-info__about">Icarus Music es el único sello de Heavy Metal activo en Argentina, con más de 28 años editando y licenciando metal de todo el mundo.</p>
+          </div>
+        </div>
+        <a href="https://icarusmusicstore.com" target="_blank" rel="noopener" class="btn btn--ghost tour-sidebar__btn">Icarus Music Store ›</a>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__logo">Buena <b>Muerte</b></div>
+    <p class="site-footer__tag">Death Metal · Zona Sur · AMBA · Argentina · desde 2013</p>
+    <div class="site-footer__social">
+      <a href="https://instagram.com/buena.muerte" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.17.05 1.8.25 2.22.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.05.41 2.22.06 1.27.07 1.65.07 4.85s0 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.22-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.05.36-2.22.41-1.27.06-1.65.07-4.85.07s-3.58 0-4.85-.07c-1.17-.05-1.8-.25-2.22-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.05-.41-2.22C2.21 15.58 2.2 15.2 2.2 12s0-3.58.07-4.85c.05-1.17.25-1.8.41-2.22.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.05-.36 2.22-.41C8.42 2.21 8.8 2.2 12 2.2zm0 1.8c-3.14 0-3.5 0-4.74.07-.9.04-1.38.2-1.7.32-.43.16-.74.36-1.06.68-.32.32-.52.63-.68 1.06-.12.32-.28.8-.32 1.7C4.2 8.5 4.2 8.86 4.2 12s0 3.5.07 4.74c.04.9.2 1.38.32 1.7.16.43.36.74.68 1.06.32.32.63.52 1.06.68.32.12.8.28 1.7.32 1.24.07 1.6.07 4.74.07s3.5 0 4.74-.07c.9-.04 1.38-.2 1.7-.32.43-.16.74-.36 1.06-.68.32-.32.52-.63.68-1.06.12-.32.28-.8.32-1.7.07-1.24.07-1.6.07-4.74s0-3.5-.07-4.74c-.04-.9-.2-1.38-.32-1.7a2.85 2.85 0 0 0-.68-1.06 2.85 2.85 0 0 0-1.06-.68c-.32-.12-.8-.28-1.7-.32C15.5 4 15.14 4 12 4zm0 3.06A4.94 4.94 0 1 1 12 16.94 4.94 4.94 0 0 1 12 7.06zm0 8.14A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4zm6.3-8.34a1.15 1.15 0 1 1-2.3 0 1.15 1.15 0 0 1 2.3 0z"/></svg></a>
+      <a href="https://twitter.com/muerte_buena" target="_blank" rel="noopener" aria-label="Twitter / X"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      <a href="https://soundcloud.com/buenamuerte-music" target="_blank" rel="noopener" aria-label="SoundCloud"><svg viewBox="0 0 24 24"><path d="M1.175 12.225c-.051 0-.094.046-.101.1l-.233 2.154.233 2.105c.007.058.05.098.101.098.05 0 .09-.04.099-.098l.255-2.105-.27-2.154c-.009-.057-.05-.1-.1-.1m-.899.828c-.06 0-.091.037-.104.094L0 14.479l.172 1.308c.013.06.045.094.104.094.057 0 .09-.038.099-.094l.195-1.308-.195-1.334c-.009-.055-.042-.09-.099-.09m1.8-1.329c-.063 0-.105.048-.11.107l-.204 2.642.204 2.55c.006.058.047.108.11.108.06 0 .104-.05.111-.108l.229-2.55-.23-2.642c-.006-.06-.05-.107-.11-.107m.898-.49c-.072 0-.117.052-.12.116l-.188 3.134.188 2.589c.004.066.048.119.12.119.07 0 .115-.053.12-.119l.212-2.589-.212-3.134c-.005-.064-.05-.116-.12-.116m.901-.364c-.078 0-.129.057-.134.127l-.17 3.499.17 2.606c.005.07.056.128.134.128.077 0 .127-.058.133-.128l.19-2.606-.19-3.499c-.006-.07-.056-.127-.133-.127m.9 0c-.085 0-.138.062-.143.137l-.155 3.498.155 2.608c.005.075.058.137.143.137.084 0 .137-.062.142-.137l.172-2.608-.172-3.498c-.005-.075-.058-.137-.142-.137m.899-.181c-.093 0-.148.066-.152.147l-.14 3.68.14 2.602c.004.08.06.147.152.147.09 0 .147-.067.152-.147l.156-2.602-.156-3.68c-.005-.08-.062-.147-.152-.147m.901-.09c-.1 0-.157.072-.162.157l-.125 3.77.125 2.601c.004.085.063.157.162.157.097 0 .155-.072.16-.157l.14-2.601-.14-3.77c-.005-.085-.063-.157-.16-.157m.899.09c-.107 0-.166.077-.17.167l-.11 3.673.11 2.599c.004.09.064.167.17.167.105 0 .165-.077.17-.167l.122-2.599-.122-3.673c-.005-.09-.065-.167-.17-.167m.9 0c-.115 0-.175.082-.18.178l-.095 3.673.095 2.597c.004.095.066.178.18.178.112 0 .174-.083.179-.178l.106-2.597-.106-3.673c-.005-.095-.067-.178-.18-.178m3.616-1.474c-.265 0-.52.05-.755.144-.184-2.07-1.93-3.685-4.104-3.685-.566 0-1.113.116-1.598.327-.19.082-.24.163-.243.33v10.562c.003.175.143.317.32.33h6.38c1.74 0 3.15-1.41 3.15-3.15 0-1.74-1.41-3.15-3.15-3.15"/></svg></a>
+      <a href="https://facebook.com/Buenamuertedeathtrio" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12z"/></svg></a>
+      <a href="https://open.spotify.com/artist/5q9MTB7bYNx20VzAsYTblL" target="_blank" rel="noopener" aria-label="Spotify"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm4.59 14.43a.62.62 0 0 1-.86.21c-2.35-1.44-5.3-1.76-8.79-.96a.62.62 0 1 1-.28-1.22c3.8-.86 7.07-.49 9.71 1.11.3.18.39.57.22.86zm1.23-2.74a.78.78 0 0 1-1.07.26c-2.68-1.65-6.78-2.13-9.92-1.16a.78.78 0 1 1-.45-1.49c3.6-1.09 8.12-.56 11.19 1.32.36.23.48.71.25 1.07zm.11-2.85C14.83 8.96 9.4 8.78 6.36 9.74a.94.94 0 1 1-.54-1.8c3.5-1.06 9.49-.85 13.24 1.28a.94.94 0 0 1-.96 1.62z"/></svg></a>
+      <a href="mailto:favioleguizamon2@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24"><path d="M2 4h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm10 7L2 6.5V6h20v.5L12 13zm0 2.3 10-6.5V18H2V8.8l10 6.5z"/></svg></a>
+    </div>
+    <p class="site-footer__version">v1.0 · 21 de julio, 2026</p>
+    <p class="site-footer__copy">© Buena Muerte, <b>2013—2026</b> · All Rights Reserved</p>
+    <p class="site-footer__visits">Visitas: <span id="visitCounter">0</span></p>
+    <a href="#top" class="site-footer__to-top">↑ Back to Top</a>
+  </div>
+</footer>
+
+<script src="assets/js.js"></script>
+</body>
+</html>
