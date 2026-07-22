@@ -242,7 +242,7 @@ function initShareButtons() {
 /* ============================================================
    Inicialización global
    ============================================================ */
-// Video inline play — solo uno a la vez
+// Video inline play — solo uno a la vez, 1s de cruce
 var currentVideoPlayer = null;
 var currentVideoThumb = null;
 
@@ -252,11 +252,8 @@ function initVideoInline() {
     el.dataset.bound = '1';
     el.addEventListener('click', function () {
       var videoId = el.dataset.video;
-      // Si hay otro video reproduciéndose, quitarlo
-      if (currentVideoPlayer) {
-        currentVideoPlayer.remove();
-        if (currentVideoThumb) currentVideoThumb.style.display = '';
-      }
+      var oldPlayer = currentVideoPlayer;
+      var oldThumb = currentVideoThumb;
       // Crear nuevo player inline
       var player = document.createElement('div');
       player.className = 'video-inline-player';
@@ -265,6 +262,13 @@ function initVideoInline() {
       el.parentNode.insertBefore(player, el.nextSibling);
       currentVideoPlayer = player;
       currentVideoThumb = el;
+      // Quitar el anterior después de 1s
+      if (oldPlayer) {
+        setTimeout(function () {
+          oldPlayer.remove();
+          if (oldThumb) oldThumb.style.display = '';
+        }, 1000);
+      }
     });
     el.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') {
