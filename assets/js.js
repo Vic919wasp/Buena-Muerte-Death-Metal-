@@ -261,36 +261,25 @@ function initVideoShuffle() {
   setInterval(shuffle, 15000);
 }
 
-// Video modal
-function initVideoModal() {
-  var modal = document.getElementById('videoModal');
-  var player = document.getElementById('modalPlayer');
-  if (!modal || !player) return;
-
-  function openModal(videoId) {
-    player.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-    modal.classList.add('is-open');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeModal() {
-    player.innerHTML = '';
-    modal.classList.remove('is-open');
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
-
+// Video inline play
+function initVideoInline() {
   document.querySelectorAll('[data-video]').forEach(function (el) {
-    el.addEventListener('click', function () { openModal(el.dataset.video); });
-    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(el.dataset.video); } });
+    el.addEventListener('click', function () {
+      var videoId = el.dataset.video;
+      var slide = el.closest('.video-slide');
+      if (!slide) return;
+      var player = document.createElement('div');
+      player.className = 'video-inline-player';
+      player.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+      el.replaceWith(player);
+    });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        el.click();
+      }
+    });
   });
-
-  modal.querySelectorAll('[data-close-modal]').forEach(function (el) {
-    el.addEventListener('click', closeModal);
-  });
-
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal(); });
 }
 
 /* ============================================================
@@ -442,7 +431,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initNewsletter();
   initContact();
   initVideoShuffle();
-  initVideoModal();
+  initVideoInline();
   initFog();
   initShareButtons();
   initNavScroll();
