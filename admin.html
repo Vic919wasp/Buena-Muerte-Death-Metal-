@@ -1,6 +1,12 @@
 <!-- ============================================================
      CONTEXTO: Página de administración para ver y exportar emails
                suscritos al newsletter. Guarda en localStorage.
+     ============================================================
+     ÍNDICE DE NAVEGACIÓN
+     [001] HEAD / META         - línea 5
+     [002] ESTILOS CSS         - línea 14
+     [003] ESTRUCTURA HTML     - línea 33
+     [004] LÓGICA JS           - línea 52
      ============================================================ -->
 <!DOCTYPE html>
 <html lang="es">
@@ -11,6 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<!-- [002] ESTILOS CSS -->
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:#050607; color:#c8ccd0; font-family:'Inter',system-ui,sans-serif; padding:2rem; }
@@ -31,6 +38,7 @@
 </style>
 </head>
 <body>
+<!-- [003] ESTRUCTURA HTML -->
 <h1>§ Administrar Newsletter</h1>
 <p class="info">Emails suscritos al newsletter de Buena Muerte. Guardados en localStorage del navegador.</p>
 
@@ -49,6 +57,7 @@
 <div id="tableWrap"></div>
 <div class="toast" id="toast"></div>
 
+<!-- [004] LÓGICA JS -->
 <script>
 function getSubs() {
   try { return JSON.parse(localStorage.getItem('bm_subscribers') || '[]'); }

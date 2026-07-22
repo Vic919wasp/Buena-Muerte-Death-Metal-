@@ -28,6 +28,7 @@
 /* [01] VARIABLES / TOKENS */
 :root {
   --negro:          #050607;
+  --negro-1:        #070a0c;
   --negro-2:        #0a0c0d;
   --negro-3:        #111416;
   --plata:          #9aa0a6;
@@ -136,7 +137,6 @@ body::before {
   letter-spacing: 0;
 }
 .site-header__logo .logo-img svg { width: 100%; height: 100%; }
-.site-header__logo b { color: var(--rojo-vivo); font-weight: 700; }
 
 .site-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 1.6rem; }
 .site-nav a {
@@ -870,8 +870,5 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
-  .disc { animation: flotar 4s ease-in-out infinite !important; }
-  .disc:last-child { animation: flotar-alt 4.5s ease-in-out infinite 1.2s !important; }
-  .disc__cover { animation: flotar-cover 5s ease-in-out infinite .6s !important; }
   .page-section { opacity: 1; transform: none; }
 }

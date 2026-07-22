@@ -1,6 +1,6 @@
 .opencode/
 imagenes/
-incrementar-visitas.ps1
 *.bak
+.csv
 .DS_Store
 Thumbs.db

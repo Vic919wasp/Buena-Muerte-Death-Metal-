@@ -6,14 +6,17 @@
              carga lazy de Spotify embeds y render de fechas FECHAS[].
    ============================================================
    ÍNDICE DE SECCIONES
-   [01] Helpers               - línea 8
-   [02] Datos editables       - línea 18
-   [03] Nav / toggle mobile   - línea 35
-   [04] Active link scroll    - línea 60
-   [05] Smooth scroll anchor  - línea 80
-   [06] Tour render           - línea 95
-   [07] Spotify lazy load     - línea 130
-   [08] Newsletter / contact  - línea 145
+   [01] Helpers               - línea 27
+   [02] Datos editables       - línea 20
+   [03] Nav / toggle mobile   - línea 57
+   [04] Active link scroll    - línea 83
+   [05] Smooth scroll anchor  - línea 104
+   [06] Tour render           - línea 120
+   [07] Spotify lazy load     - línea 154
+   [08] Newsletter form       - línea 173
+   [09] Share buttons         - línea 217
+   [10] Fog                   - línea 291
+   [11] Nav scroll mobile     - línea 358
    ============================================================ */
 
 /* EDITAR acá para cargar fechas. Vacío = estado cero visible. */
@@ -199,22 +202,8 @@ function initNewsletter() {
   });
 }
 
-function initContact() {
-  var form = qs('#contactForm');
-  if (!form) return;
-  form.addEventListener('submit', function (ev) {
-    ev.preventDefault();
-    var note = qs('.form-success', form) || qs('.newsletter-form__note');
-    if (note) {
-      note.textContent = '✔ Recibido. La banda confirmará su respuesta a la brevedad. †';
-      note.classList.add('form-success');
-    }
-    form.reset();
-  });
-}
-
 /* ============================================================
-   [10] Share buttons — copy URL to clipboard
+   [09] Share buttons — copy URL to clipboard
    ============================================================ */
 function initShareButtons() {
   document.querySelectorAll('[data-share-url]').forEach(function (btn) {
@@ -353,7 +342,7 @@ function initFog() {
 }
 
 /* ============================================================
-   [10] Nav scroll infinito mobile + touch + mouse drag
+   [11] Nav scroll infinito mobile + touch + mouse drag
    ============================================================ */
 function initNavScroll() {
   var track = document.querySelector('.nav-track');
@@ -434,7 +423,6 @@ document.addEventListener('DOMContentLoaded', function () {
   renderFechas();
   initSpotifyLazy();
   initNewsletter();
-  initContact();
   initVideoInline();
   initFog();
   initShareButtons();
