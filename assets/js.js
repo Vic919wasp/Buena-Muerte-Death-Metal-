@@ -254,6 +254,68 @@ function initVideoModal() {
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal(); });
 }
 
+/* ============================================================
+   [09] Sparkles — destellos sutiles detrás del fondo
+   ============================================================ */
+function initSparkles() {
+  var canvas = document.getElementById('sparkles');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var MAX = 12;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function createParticle() {
+    return {
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 2.5 + 0.5,
+      alpha: 0,
+      alphaDir: Math.random() * 0.008 + 0.003,
+      life: 0,
+      maxLife: Math.random() * 400 + 200,
+      hue: Math.random() > 0.7 ? 35 : 0
+    };
+  }
+
+  for (var i = 0; i < MAX; i++) {
+    var p = createParticle();
+    p.life = Math.random() * p.maxLife;
+    particles.push(p);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      p.life++;
+      if (p.life > p.maxLife) {
+        particles[i] = createParticle();
+        continue;
+      }
+      var progress = p.life / p.maxLife;
+      var fade = progress < 0.3 ? progress / 0.3 : progress > 0.7 ? (1 - progress) / 0.3 : 1;
+      p.alpha = fade * 0.35;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      if (p.hue) {
+        ctx.fillStyle = 'rgba(200,170,110,' + p.alpha + ')';
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,' + p.alpha + ')';
+      }
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   initNav();
   initActiveLink();
@@ -263,6 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initForms();
   initCarousels();
   initVideoModal();
+  initSparkles();
 
   // Visit counter
   var counterEl = document.getElementById('visitCounter');
