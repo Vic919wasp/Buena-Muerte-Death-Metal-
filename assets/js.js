@@ -428,18 +428,10 @@ document.addEventListener('DOMContentLoaded', function () {
   initShareButtons();
   initNavScroll();
 
-  // Presentación scroll: recorre todo el contenido viewport a viewport
+  // Presentación scroll: baja rápido hasta el final y vuelve al inicio
   var scrollH = document.documentElement.scrollHeight - window.innerHeight;
-  var vh = window.innerHeight;
-  var steps = Math.ceil(scrollH / vh);
-  var delay = 400;
-  for (var i = 1; i <= steps; i++) {
-    (function (pos) {
-      setTimeout(function () { window.scrollTo({ top: pos, behavior: 'smooth' }); }, delay);
-    })(Math.min(i * vh, scrollH));
-    delay += 250;
-  }
-  setTimeout(function () { window.scrollTo({ top: 0, behavior: 'auto' }); }, delay + 300);
+  setTimeout(function () { window.scrollTo({ top: scrollH, behavior: 'smooth' }); }, 400);
+  setTimeout(function () { window.scrollTo({ top: 0, behavior: 'auto' }); }, 900);
 
   // Visit counter
   var counterEl = document.getElementById('visitCounter');
