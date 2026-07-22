@@ -520,11 +520,13 @@ function initMiniPlayer() {
     for (var i = 0; i < buf.length; i++) {
       var h = (buf[i] / 255) * cvs.height;
       var x = i * w;
-      var g = cx.createLinearGradient(0, cvs.height, 0, cvs.height - h);
-      g.addColorStop(0, 'rgba(74,15,13,.2)');
-      g.addColorStop(0.6, 'rgba(74,15,13,.7)');
-      g.addColorStop(1, 'rgba(200,204,208,.9)');
-      cx.fillStyle = g;
+      if (h < 4) {
+        cx.fillStyle = 'rgba(180,180,180,.25)';
+      } else if (h > cvs.height * 0.6) {
+        cx.fillStyle = 'rgba(74,15,13,.85)';
+      } else {
+        cx.fillStyle = 'rgba(180,180,180,.5)';
+      }
       cx.fillRect(x, cvs.height - h, w - 1, h);
     }
   }
