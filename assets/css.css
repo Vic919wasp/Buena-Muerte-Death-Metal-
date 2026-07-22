@@ -864,8 +864,6 @@ body::before {
 
 @keyframes casinoSpin {
   0%   { opacity: 0; transform: translateY(100vh); }
-  60%  { opacity: 1; transform: translateY(-10px); }
-  80%  { transform: translateY(5px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
