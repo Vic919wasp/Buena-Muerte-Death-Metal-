@@ -363,9 +363,9 @@ function initNavScroll() {
   // Animación continua con JS
   function autoScroll() {
     if (!paused) {
-      pos -= speed;
+      pos += speed;
       var half = track.scrollWidth / 2;
-      if (Math.abs(pos) >= half) pos = 0;
+      if (pos >= half) pos = 0;
       track.style.transform = 'translateX(' + pos + 'px)';
     }
     requestAnimationFrame(autoScroll);
@@ -428,8 +428,18 @@ document.addEventListener('DOMContentLoaded', function () {
   initShareButtons();
   initNavScroll();
 
-  // Reset scroll al tope después de la animación casino
-  setTimeout(function () { window.scrollTo(0, 0); }, 1200);
+  // Presentación scroll: recorre todo el contenido viewport a viewport
+  var scrollH = document.documentElement.scrollHeight - window.innerHeight;
+  var vh = window.innerHeight;
+  var steps = Math.ceil(scrollH / vh);
+  var delay = 400;
+  for (var i = 1; i <= steps; i++) {
+    (function (pos) {
+      setTimeout(function () { window.scrollTo({ top: pos, behavior: 'smooth' }); }, delay);
+    })(Math.min(i * vh, scrollH));
+    delay += 250;
+  }
+  setTimeout(function () { window.scrollTo({ top: 0, behavior: 'auto' }); }, delay + 300);
 
   // Visit counter
   var counterEl = document.getElementById('visitCounter');
