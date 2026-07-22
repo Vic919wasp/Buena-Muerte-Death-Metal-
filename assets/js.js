@@ -242,26 +242,6 @@ function initShareButtons() {
 /* ============================================================
    Inicialización global
    ============================================================ */
-// Video shuffle — reordena los 9 videos cada 15s
-function initVideoShuffle() {
-  var container = document.getElementById('videoGrid');
-  if (!container) return;
-  var slides = Array.prototype.slice.call(container.querySelectorAll('.video-slide'));
-
-  function shuffle() {
-    for (var i = slides.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = slides[i];
-      slides[i] = slides[j];
-      slides[j] = temp;
-    }
-    slides.forEach(function (slide) { container.appendChild(slide); });
-    initVideoInline();
-  }
-
-  setInterval(shuffle, 15000);
-}
-
 // Video inline play
 function initVideoInline() {
   document.querySelectorAll('.video-thumb[data-video]').forEach(function (el) {
@@ -431,7 +411,6 @@ document.addEventListener('DOMContentLoaded', function () {
   initSpotifyLazy();
   initNewsletter();
   initContact();
-  initVideoShuffle();
   initVideoInline();
   initFog();
   initShareButtons();
