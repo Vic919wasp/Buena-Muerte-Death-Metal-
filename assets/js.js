@@ -280,9 +280,9 @@ function initFog() {
       targetAlpha: Math.random() * 0.5,
       alphaSpeed: Math.random() * 0.003 + 0.001,
       life: 0,
-      maxLife: Math.random() * 600 + 300,
-      driftX: (Math.random() - 0.5) * 0.3,
-      driftY: (Math.random() - 0.5) * 0.15
+      maxLife: Math.random() * 300 + 150,
+      driftX: (Math.random() - 0.5) * 1.2,
+      driftY: (Math.random() - 0.5) * 0.6
     };
   }
 
