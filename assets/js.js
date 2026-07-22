@@ -277,7 +277,7 @@ function initFog() {
       y: Math.random() * canvas.height,
       radius: Math.random() * 300 + 150,
       alpha: 0,
-      targetAlpha: Math.random() * 0.5,
+      targetAlpha: Math.random() * 0.4 + 0.3,
       alphaSpeed: Math.random() * 0.003 + 0.001,
       life: 0,
       maxLife: Math.random() * 300 + 150,
