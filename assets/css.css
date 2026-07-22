@@ -580,6 +580,45 @@ body::before {
 .video-modal__close:hover { border-color: var(--rojo-vivo); color: var(--rojo-vivo); }
 .video-channel { text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--linea); }
 
+/* [09b] VIDEO SHARE BUTTON */
+.video-share {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  margin-top: .5rem;
+  padding: .3rem .7rem;
+  background: transparent;
+  border: 1px solid var(--linea);
+  color: var(--bronce-claro);
+  font-family: var(--fuente-sans);
+  font-size: .55rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .25s;
+  border-radius: 3px;
+}
+.video-share:hover { border-color: var(--rojo-vivo); color: var(--hueso); background: var(--rojo-sangre); }
+.video-share svg { fill: currentColor; flex-shrink: 0; }
+.video-share.is-copied { border-color: var(--bronce-claro); color: var(--bronce-claro); pointer-events: none; }
+
+/* [08c] DISCOGRAPHY SHARE BUTTON */
+.disc__actions { margin-top: 1.2rem; }
+.btn--share {
+  background: transparent;
+  border: 1px solid var(--linea);
+  color: var(--bronce-claro);
+  font-family: var(--fuente-sans);
+  font-size: .58rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  padding: .6rem 1.2rem;
+  cursor: pointer;
+  transition: all .25s;
+}
+.btn--share:hover { border-color: var(--rojo-vivo); color: var(--hueso); background: var(--rojo-sangre); }
+.btn--share.is-copied { border-color: var(--bronce-claro); color: var(--bronce-claro); pointer-events: none; }
+
 /* [10] BAND / BIO */
 .bio { max-width: 760px; margin: 0 auto; }
 .bio p { font-family: var(--fuente-serif); font-size: 1.2rem; line-height: 1.75; color: var(--hueso); margin-bottom: 1.4rem; }
@@ -792,6 +831,8 @@ body::before {
     order: 1;
   }
   .header-cta { display: none; }
+  .site-header__row { grid-template-columns: auto 1fr auto; }
+  .lang-selector { display: flex; }
   .disc { grid-template-columns: 1fr; }
   .disc__cover { max-width: 360px; margin: 0 auto; }
   .news-layout { grid-template-columns: 1fr; }

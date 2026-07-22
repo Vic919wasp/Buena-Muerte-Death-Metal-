@@ -159,6 +159,32 @@ function initForms() {
 }
 
 /* ============================================================
+   [10] Share buttons — copy URL to clipboard
+   ============================================================ */
+function initShareButtons() {
+  document.querySelectorAll('[data-share-url]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var url = btn.getAttribute('data-share-url');
+      var title = btn.getAttribute('data-share-title') || 'Buena Muerte';
+      if (navigator.share) {
+        navigator.share({ title: title, url: url }).catch(function () {});
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(function () {
+          var label = btn.querySelector('[data-i18n="video_share"]');
+          var original = label ? label.textContent : '';
+          if (label) label.textContent = '¡Link copiado!';
+          btn.classList.add('is-copied');
+          setTimeout(function () {
+            if (label) label.textContent = original;
+            btn.classList.remove('is-copied');
+          }, 2000);
+        });
+      }
+    });
+  });
+}
+
+/* ============================================================
    Inicialización global
    ============================================================ */
 // Video shuffle — reordena los 9 videos cada 15s
@@ -286,6 +312,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initVideoShuffle();
   initVideoModal();
   initFog();
+  initShareButtons();
 
   // Visit counter
   var counterEl = document.getElementById('visitCounter');
