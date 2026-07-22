@@ -428,11 +428,6 @@ document.addEventListener('DOMContentLoaded', function () {
   initShareButtons();
   initNavScroll();
 
-  // Presentación scroll: baja rápido hasta el final y vuelve al inicio
-  var scrollH = document.documentElement.scrollHeight - window.innerHeight;
-  setTimeout(function () { window.scrollTo({ top: scrollH, behavior: 'smooth' }); }, 200);
-  setTimeout(function () { window.scrollTo({ top: 0, behavior: 'auto' }); }, 450);
-
   // Visit counter
   var counterEl = document.getElementById('visitCounter');
   if (counterEl) {
