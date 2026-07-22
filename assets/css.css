@@ -852,7 +852,7 @@ body::before {
 .page-section {
   opacity: 0;
   transform: translateY(100vh);
-  animation: casinoSpin 1.2s cubic-bezier(.23, 1, .32, 1) forwards;
+  animation: casinoSpin .6s cubic-bezier(.23, 1, .32, 1) forwards;
 }
 .page-section:nth-child(1) { animation-delay: .05s; }
 .page-section:nth-child(2) { animation-delay: .12s; }
