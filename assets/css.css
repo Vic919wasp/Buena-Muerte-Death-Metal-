@@ -629,7 +629,7 @@ body::before {
 }
 .member:hover { border-color: var(--bronce); }
 .member__photo {
-  width: 180px; height: 180px;
+  width: 250px; height: 250px;
   border-radius: 50%;
   margin: 0 auto 1.2rem;
   background: linear-gradient(145deg, var(--negro-3), var(--negro-2));
@@ -829,7 +829,7 @@ body::before {
   .hero { min-height: 70vh; padding: 4rem 1rem; }
   .section { padding: 4rem 0; }
   .form-row { flex-direction: column; }
-  .member__photo { width: 140px; height: 140px; }
+  .member__photo { width: 200px; height: 200px; }
   .members { grid-template-columns: 1fr; gap: 2.5rem; }
   .gallery { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .5rem; }
   .video-grid { grid-template-columns: 1fr; }
@@ -839,7 +839,7 @@ body::before {
   .footer__social { gap: 1rem; }
 }
 @media (max-width: 480px) {
-  .member__photo { width: 120px; height: 120px; }
+  .member__photo { width: 180px; height: 180px; }
   .section__title { font-size: 1.6rem; }
   .section { padding: 3rem 0; }
   .hero { min-height: 60vh; padding: 3rem 1rem; }
