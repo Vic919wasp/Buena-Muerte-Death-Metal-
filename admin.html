@@ -1,0 +1,139 @@
+<!-- ============================================================
+     CONTEXTO: Página de administración para ver y exportar emails
+               suscritos al newsletter. Guarda en localStorage.
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administrar Newsletter — Buena Muerte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#050607; color:#c8ccd0; font-family:'Inter',system-ui,sans-serif; padding:2rem; }
+  h1 { font-family:'Cinzel',serif; color:#9aa0a6; font-size:1.4rem; margin-bottom:.5rem; }
+  .info { font-size:.75rem; color:#7a6346; margin-bottom:1.5rem; }
+  .stats { font-size:.85rem; color:#9aa0a6; margin-bottom:1rem; }
+  table { width:100%; border-collapse:collapse; font-size:.8rem; }
+  th { text-align:left; padding:.6rem .8rem; border-bottom:1px solid #1f2225; color:#7a6346; font-family:'Cinzel',serif; font-weight:400; }
+  td { padding:.5rem .8rem; border-bottom:1px solid #111416; }
+  tr:hover td { background:#0a0c0d; }
+  .btn { display:inline-block; padding:.5rem 1rem; margin:.3rem .5rem .3rem 0; border:1px solid #1f2225; background:#0a0c0d; color:#c8ccd0; font-family:'Cinzel',serif; font-size:.75rem; letter-spacing:.1em; cursor:pointer; text-decoration:none; }
+  .btn:hover { border-color:#7a6346; color:#e8e6df; }
+  .btn--danger { border-color:#4a0f0d; color:#7a1814; }
+  .btn--danger:hover { background:#4a0f0d; color:#e8e6df; }
+  .actions { margin:1.5rem 0; }
+  .empty { color:#7a6346; font-style:italic; padding:2rem 0; }
+  .toast { position:fixed; bottom:1rem; right:1rem; background:#0a0c0d; border:1px solid #7a6346; padding:.8rem 1.2rem; font-size:.75rem; color:#e8e6df; display:none; }
+</style>
+</head>
+<body>
+<h1>§ Administrar Newsletter</h1>
+<p class="info">Emails suscritos al newsletter de Buena Muerte. Guardados en localStorage del navegador.</p>
+
+<div class="stats">
+  <span id="count">0</span> suscriptos
+</div>
+
+<div class="actions">
+  <button class="btn" id="btnExport">Descargar JSON ›</button>
+  <button class="btn" id="btnCopy">Copiar emails ›</button>
+  <button class="btn" id="btnImport">Importar JSON ›</button>
+  <button class="btn btn--danger" id="btnClear">Borrar todo</button>
+  <input type="file" id="fileInput" accept=".json" style="display:none">
+</div>
+
+<div id="tableWrap"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+function getSubs() {
+  try { return JSON.parse(localStorage.getItem('bm_subscribers') || '[]'); }
+  catch(e) { return []; }
+}
+function saveSubs(list) { localStorage.setItem('bm_subscribers', JSON.stringify(list)); }
+function render() {
+  var subs = getSubs();
+  document.getElementById('count').textContent = subs.length;
+  var wrap = document.getElementById('tableWrap');
+  if (!subs.length) { wrap.innerHTML = '<p class="empty">No hay suscriptos aún.</p>'; return; }
+  var html = '<table><thead><tr><th>#</th><th>Email</th><th>Fecha</th><th>Acción</th></tr></thead><tbody>';
+  subs.forEach(function(s,i) {
+    html += '<tr><td>'+(i+1)+'</td><td>'+s.email+'</td><td>'+(s.date||'—')+'</td><td><button class="btn btn--danger" onclick="remove('+i+')">Quitar</button></td></tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+function remove(i) {
+  var subs = getSubs();
+  subs.splice(i,1);
+  saveSubs(subs);
+  render();
+}
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(function(){ t.style.display='none'; }, 2000);
+}
+document.getElementById('btnExport').addEventListener('click', function() {
+  var subs = getSubs();
+  var blob = new Blob([JSON.stringify({subscribers:subs},null,2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'newsletter-subscribers.json';
+  a.click();
+  toast('Descargado: ' + subs.length + ' emails');
+});
+document.getElementById('btnCopy').addEventListener('click', function() {
+  var subs = getSubs();
+  var text = subs.map(function(s){ return s.email; }).join('\n');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function(){ toast('Emails copiados al portapapeles'); });
+  } else {
+    toast('No se puede copiar automáticamente');
+  }
+});
+document.getElementById('btnImport').addEventListener('click', function() {
+  document.getElementById('fileInput').click();
+});
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var data = JSON.parse(ev.target.result);
+      var incoming = data.subscribers || data;
+      if (!Array.isArray(incoming)) throw new Error('Formato inválido');
+      var existing = getSubs();
+      var existingEmails = existing.map(function(s){return s.email;});
+      var added = 0;
+      incoming.forEach(function(s) {
+        if (s.email && existingEmails.indexOf(s.email) === -1) {
+          existing.push(s);
+          existingEmails.push(s.email);
+          added++;
+        }
+      });
+      saveSubs(existing);
+      render();
+      toast('Importados ' + added + ' nuevos emails');
+    } catch(err) { toast('Error: ' + err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+document.getElementById('btnClear').addEventListener('click', function() {
+  if (confirm('¿Borrar todos los suscriptos?')) {
+    saveSubs([]);
+    render();
+    toast('Todos los emails eliminados');
+  }
+});
+render();
+</script>
+</body>
+</html>

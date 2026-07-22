@@ -113,7 +113,7 @@ function renderFechas() {
   body.innerHTML = FECHAS.map(function (f) {
     return '<tr><td class="dia">' + f.dia + '<br><span style="font-size:.55rem;letter-spacing:.25em;color:var(--bronce);">' + (f.mes || '') + ' ' + (f.anio || '') + '</span></td>' +
            '<td class="lugar">' + f.lugar + '<span>' + (f.ciudad || '') + '</span></td>' +
-           '<td class="btt"><a href="' + (f.link || '#') + '" target="_blank" rel="noopener">TICKETS ›</a></td></tr>';
+           '<td class="btt"><a href="' + (f.link || '#') + '" target="_blank" rel="noopener">ENTRADAS ›</a></td></tr>';
   }).join('');
 }
 
@@ -142,19 +142,58 @@ function initSpotifyLazy() {
 }
 
 /* ============================================================
-   [08] Newsletter / Contact (handlers fake sin backend)
+   [08] Newsletter / Contact
    ============================================================ */
-function initForms() {
-  qsa('form[data-fake]').forEach(function (form) {
-    form.addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      var note = qs('.form-success', form) || qs('.newsletter-form__note');
-      if (note) {
-        note.textContent = '✔ Recibido. La banda confirmará su respuesta a la brevedad. †';
-        note.classList.add('form-success');
-      }
+function getSubscribers() {
+  try { return JSON.parse(localStorage.getItem('bm_subscribers') || '[]'); }
+  catch (e) { return []; }
+}
+
+function saveSubscribers(list) {
+  localStorage.setItem('bm_subscribers', JSON.stringify(list));
+}
+
+function initNewsletter() {
+  var form = qs('#newsletterForm');
+  if (!form) return;
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var input = qs('input[name="email"]', form);
+    var note = qs('.newsletter-form__note', form);
+    var email = (input.value || '').trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (note) { note.textContent = 'Ingresá un email válido.'; note.style.color = '#c00'; }
+      return;
+    }
+    var subs = getSubscribers();
+    var exists = subs.some(function (s) { return s.email === email; });
+    if (exists) {
+      if (note) { note.textContent = 'Este email ya está suscrito.'; note.style.color = 'var(--bronce)'; }
       form.reset();
-    });
+      return;
+    }
+    subs.push({ email: email, date: new Date().toISOString().split('T')[0] });
+    saveSubscribers(subs);
+    if (note) {
+      note.textContent = '✔ Suscripto. Próximamente recibirás novedades de la banda. †';
+      note.style.color = '#4a0f0d';
+      note.classList.add('form-success');
+    }
+    form.reset();
+  });
+}
+
+function initContact() {
+  var form = qs('#contactForm');
+  if (!form) return;
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var note = qs('.form-success', form) || qs('.newsletter-form__note');
+    if (note) {
+      note.textContent = '✔ Recibido. La banda confirmará su respuesta a la brevedad. †';
+      note.classList.add('form-success');
+    }
+    form.reset();
   });
 }
 
@@ -308,7 +347,8 @@ document.addEventListener('DOMContentLoaded', function () {
   initSmoothScroll();
   renderFechas();
   initSpotifyLazy();
-  initForms();
+  initNewsletter();
+  initContact();
   initVideoShuffle();
   initVideoModal();
   initFog();
