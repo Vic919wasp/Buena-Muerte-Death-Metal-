@@ -580,27 +580,17 @@ body::before {
 .video-modal__close:hover { border-color: var(--rojo-vivo); color: var(--rojo-vivo); }
 .video-channel { text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--linea); }
 
-/* [09b] VIDEO SHARE BUTTON */
-.video-share {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  margin-top: .5rem;
-  padding: .3rem .7rem;
-  background: transparent;
-  border: 1px solid var(--linea);
-  color: var(--bronce-claro);
-  font-family: var(--fuente-sans);
-  font-size: .55rem;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .25s;
-  border-radius: 3px;
+/* [09b] VIDEO SHARE BUTTONS */
+.video-share-row { display: flex; gap: .4rem; margin-top: .5rem; }
+.video-share-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: none; cursor: pointer; transition: opacity .25s;
 }
-.video-share:hover { border-color: var(--rojo-vivo); color: var(--hueso); background: var(--rojo-sangre); }
-.video-share svg { fill: currentColor; flex-shrink: 0; }
-.video-share.is-copied { border-color: var(--bronce-claro); color: var(--bronce-claro); pointer-events: none; }
+.video-share-btn svg { fill: #fff; width: 14px; height: 14px; }
+.video-share-btn--wa { background: #25D366; }
+.video-share-btn--fb { background: #1877F2; }
+.video-share-btn:hover { opacity: .8; }
 
 /* [08c] DISCOGRAPHY SHARE BUTTON */
 .disc__actions { margin-top: 1.2rem; }
