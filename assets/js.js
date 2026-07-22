@@ -163,9 +163,9 @@ function initForms() {
    ============================================================ */
 // Video shuffle — reordena los 9 videos cada 15s
 function initVideoShuffle() {
-  var container = document.querySelector('.video-carousels');
+  var container = document.getElementById('videoGrid');
   if (!container) return;
-  var slides = Array.prototype.slice.call(container.querySelectorAll('.carousel__slide'));
+  var slides = Array.prototype.slice.call(container.querySelectorAll('.video-slide'));
 
   function shuffle() {
     for (var i = slides.length - 1; i > 0; i--) {
