@@ -590,12 +590,13 @@ body::before {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.95);
+  z-index: 0;
 }
 .video-modal__content {
   position: relative;
   width: 100%;
   max-width: 960px;
-  z-index: 1;
+  z-index: 2;
   margin: auto;
 }
 .video-modal__player {
@@ -605,6 +606,7 @@ body::before {
   background: #000;
   border-radius: 4px;
   overflow: hidden;
+  z-index: 3;
 }
 .video-modal__player iframe {
   position: absolute;
