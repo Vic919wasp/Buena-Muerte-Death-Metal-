@@ -641,7 +641,7 @@ body::before {
 .video-modal__content { position: relative; width: 100%; max-width: 960px; z-index: 1; }
 .video-modal__player { position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 4px; overflow: hidden; }
 .video-modal__player iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-.video-modal__close { position: fixed; top: 12px; right: 12px; z-index: 1001; background: rgba(5,6,7,.8); border: 1px solid var(--linea); color: var(--hueso); font-size: 1.2rem; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; transition: border-color .3s, color .3s; display: flex; align-items: center; justify-content: center; }
+.video-modal__close { position: fixed; top: 10px; right: 10px; z-index: 1001; background: rgba(5,6,7,.9); border: 1px solid var(--linea); color: var(--hueso); font-size: 1.4rem; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; transition: border-color .3s, color .3s; display: flex; align-items: center; justify-content: center; line-height: 1; }
 .video-modal__close:hover { border-color: var(--rojo-vivo); color: var(--rojo-vivo); }
 .video-channel { text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--linea); }
 
@@ -903,10 +903,10 @@ body::before {
   .members { grid-template-columns: 1fr; gap: 2.5rem; }
   .gallery { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .5rem; }
   .video-grid { grid-template-columns: 1fr; }
-  .video-modal { padding: 0; }
-  .video-modal__content { width: 100%; max-width: none; }
-  .video-modal__player { border-radius: 0; }
-  .video-modal__close { top: 8px; right: 8px; }
+  .video-modal { padding: 0; align-items: stretch; }
+  .video-modal__content { width: 100%; max-width: none; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .video-modal__player { border-radius: 0; min-height: 56.25vw; }
+  .video-modal__close { top: 8px; right: 8px; width: 38px; height: 38px; font-size: 1.2rem; background: rgba(0,0,0,.85); }
   .section__title { font-size: 2rem; }
   .section__intro { font-size: 1rem; }
   .bio p { font-size: 1.05rem; }
