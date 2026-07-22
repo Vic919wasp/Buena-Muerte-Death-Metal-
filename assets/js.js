@@ -256,6 +256,7 @@ function initVideoShuffle() {
       slides[j] = temp;
     }
     slides.forEach(function (slide) { container.appendChild(slide); });
+    initVideoInline();
   }
 
   setInterval(shuffle, 15000);
@@ -263,11 +264,11 @@ function initVideoShuffle() {
 
 // Video inline play
 function initVideoInline() {
-  document.querySelectorAll('[data-video]').forEach(function (el) {
+  document.querySelectorAll('.video-thumb[data-video]').forEach(function (el) {
+    if (el.dataset.bound) return;
+    el.dataset.bound = '1';
     el.addEventListener('click', function () {
       var videoId = el.dataset.video;
-      var slide = el.closest('.video-slide');
-      if (!slide) return;
       var player = document.createElement('div');
       player.className = 'video-inline-player';
       player.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
