@@ -161,66 +161,23 @@ function initForms() {
 /* ============================================================
    Inicialización global
    ============================================================ */
-// Carousel + auto-play random
-function initCarousels() {
-  document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
-    var track = carousel.querySelector('.carousel__track');
-    var slides = carousel.querySelectorAll('.carousel__slide');
-    var current = 0;
-    var timer = null;
-    var paused = false;
+// Video shuffle — reordena los 9 videos cada 15s
+function initVideoShuffle() {
+  var container = document.querySelector('.video-carousels');
+  if (!container) return;
+  var slides = Array.prototype.slice.call(container.querySelectorAll('.carousel__slide'));
 
-    function getSlideWidth() {
-      return slides[0].offsetWidth + parseInt(getComputedStyle(track).gap);
+  function shuffle() {
+    for (var i = slides.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = slides[i];
+      slides[i] = slides[j];
+      slides[j] = temp;
     }
+    slides.forEach(function (slide) { container.appendChild(slide); });
+  }
 
-    function showSlide(index) {
-      current = (index + slides.length) % slides.length;
-      var offset = current * getSlideWidth();
-      track.style.transform = 'translateX(-' + offset + 'px)';
-    }
-
-    function randomDelay() {
-      return 3000 + Math.random() * 5000;
-    }
-
-    function startAuto() {
-      stopAuto();
-      if (!paused) {
-        timer = setTimeout(function () {
-          showSlide(current + 1);
-          startAuto();
-        }, randomDelay());
-      }
-    }
-
-    function stopAuto() {
-      if (timer) { clearTimeout(timer); timer = null; }
-    }
-
-    // Botones manuales
-    carousel.querySelector('.carousel__btn--prev').addEventListener('click', function () {
-      showSlide(current - 1);
-      startAuto();
-    });
-    carousel.querySelector('.carousel__btn--next').addEventListener('click', function () {
-      showSlide(current + 1);
-      startAuto();
-    });
-
-    // Teclado
-    carousel.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowLeft') { showSlide(current - 1); startAuto(); }
-      if (e.key === 'ArrowRight') { showSlide(current + 1); startAuto(); }
-    });
-
-    // Hover pausa
-    carousel.addEventListener('mouseenter', function () { paused = true; stopAuto(); });
-    carousel.addEventListener('mouseleave', function () { paused = false; startAuto(); });
-
-    // Iniciar
-    startAuto();
-  });
+  setInterval(shuffle, 15000);
 }
 
 // Video modal
@@ -326,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function () {
   renderFechas();
   initSpotifyLazy();
   initForms();
-  initCarousels();
+  initVideoShuffle();
   initVideoModal();
   initFog();
 

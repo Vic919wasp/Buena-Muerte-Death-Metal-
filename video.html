@@ -1,11 +1,11 @@
 <!-- ============================================================
-     CONTEXTO: Página de Video. 3 carruseles de 3 videos cada uno.
-               Click abre popup modal con opción de cerrar.
+     CONTEXTO: Página de Video. Grid 3×3 de thumbnails YouTube.
+               Shuffle aleatorio cada 15 segundos. Click abre popup.
      ============================================================
      ÍNDICE DE NAVEGACIÓN
      [001] HEAD / META         - línea 6
      [002] HEADER / NAV        - línea 30
-     [003] VIDEO CAROUSELS     - línea 55
+     [003] VIDEO GRID          - línea 55
      [004] MODAL               - línea 145
      [005] FOOTER              - línea 155
      ============================================================ -->
@@ -57,7 +57,7 @@
       <div class="carousel" data-carousel>
         <h2 class="carousel__title">Catalepsia — LP 2024</h2>
         <div class="carousel__track">
-          <div class="carousel__slide">
+          <div class="carousel__slide is-active">
             <div class="video-thumb" data-video="naEAB9Jbh8A" tabindex="0" role="button" aria-label="Reproducir Video 01">
               <img src="https://img.youtube.com/vi/naEAB9Jbh8A/hqdefault.jpg" alt="Video 01" loading="lazy">
               <span class="video-thumb__play">▶</span>
@@ -87,7 +87,7 @@
       <div class="carousel" data-carousel>
         <h2 class="carousel__title">En Vivo</h2>
         <div class="carousel__track">
-          <div class="carousel__slide">
+          <div class="carousel__slide is-active">
             <div class="video-thumb" data-video="LmatqjXS4lk" tabindex="0" role="button" aria-label="Reproducir Video 04">
               <img src="https://img.youtube.com/vi/LmatqjXS4lk/hqdefault.jpg" alt="Video 04" loading="lazy">
               <span class="video-thumb__play">▶</span>
