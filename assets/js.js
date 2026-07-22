@@ -242,11 +242,21 @@ function initShareButtons() {
 /* ============================================================
    Inicialización global
    ============================================================ */
-// Video inline play — solo uno a la vez, 1s de cruce
+// Video inline play — preload + 1s cruce
 var currentVideoPlayer = null;
 var currentVideoThumb = null;
 
 function initVideoInline() {
+  // Precargar todos los videos de YouTube (ocultos)
+  document.querySelectorAll('.video-thumb[data-video]').forEach(function (el) {
+    var videoId = el.dataset.video;
+    var preload = document.createElement('div');
+    preload.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;';
+    preload.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '" allow="encrypted-media" style="width:1px;height:1px;"></iframe>';
+    document.body.appendChild(preload);
+  });
+
+  // Bind click para play inline
   document.querySelectorAll('.video-thumb[data-video]').forEach(function (el) {
     if (el.dataset.bound) return;
     el.dataset.bound = '1';
@@ -254,15 +264,13 @@ function initVideoInline() {
       var videoId = el.dataset.video;
       var oldPlayer = currentVideoPlayer;
       var oldThumb = currentVideoThumb;
-      // Crear nuevo player inline
       var player = document.createElement('div');
       player.className = 'video-inline-player';
-      player.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+      player.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
       el.style.display = 'none';
       el.parentNode.insertBefore(player, el.nextSibling);
       currentVideoPlayer = player;
       currentVideoThumb = el;
-      // Quitar el anterior después de 1s
       if (oldPlayer) {
         setTimeout(function () {
           oldPlayer.remove();
