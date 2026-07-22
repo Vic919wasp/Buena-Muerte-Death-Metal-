@@ -359,36 +359,209 @@ function initFog() {
 }
 
 /* ============================================================
-   [10] Nav scroll infinito mobile + touch
+   [10] Nav scroll infinito mobile + touch + mouse drag
    ============================================================ */
 function initNavScroll() {
   var track = document.querySelector('.nav-track');
   if (!track) return;
+  if (window.innerWidth > 880) return;
+
   var html = track.innerHTML;
   track.innerHTML = html + html;
 
-  var isMobile = function () { return window.innerWidth <= 880; };
-  var startX = 0, scrolling = false;
+  var pos = 0;
+  var speed = 0.4;
+  var paused = false;
+  var dragStart = 0;
+  var dragPos = 0;
+  var dragging = false;
+  var resumeTimer = null;
 
+  // Animación continua con JS
+  function autoScroll() {
+    if (!paused) {
+      pos -= speed;
+      var half = track.scrollWidth / 2;
+      if (Math.abs(pos) >= half) pos = 0;
+      track.style.transform = 'translateX(' + pos + 'px)';
+    }
+    requestAnimationFrame(autoScroll);
+  }
+  requestAnimationFrame(autoScroll);
+
+  // Touch
   track.addEventListener('touchstart', function (e) {
-    if (!isMobile()) return;
-    scrolling = true;
-    startX = e.touches[0].pageX;
-    track.style.animationPlayState = 'paused';
+    paused = true;
+    dragging = true;
+    dragStart = e.touches[0].pageX;
+    dragPos = pos;
+    clearTimeout(resumeTimer);
   }, { passive: true });
 
   track.addEventListener('touchmove', function (e) {
-    if (!scrolling) return;
+    if (!dragging) return;
     var x = e.touches[0].pageX;
-    var diff = startX - x;
-    track.scrollLeft += diff;
-    startX = x;
+    pos = dragPos + (x - dragStart);
+    track.style.transform = 'translateX(' + pos + 'px)';
   }, { passive: true });
 
   track.addEventListener('touchend', function () {
-    scrolling = false;
-    track.style.animationPlayState = '';
+    dragging = false;
+    resumeTimer = setTimeout(function () { paused = false; }, 3000);
   });
+
+  // Mouse drag (desktop)
+  track.addEventListener('mousedown', function (e) {
+    paused = true;
+    dragging = true;
+    dragStart = e.pageX;
+    dragPos = pos;
+    e.preventDefault();
+    clearTimeout(resumeTimer);
+  });
+
+  document.addEventListener('mousemove', function (e) {
+    if (!dragging) return;
+    pos = dragPos + (e.pageX - dragStart);
+    track.style.transform = 'translateX(' + pos + 'px)';
+  });
+
+  document.addEventListener('mouseup', function () {
+    if (!dragging) return;
+    dragging = false;
+    resumeTimer = setTimeout(function () { paused = false; }, 3000);
+  });
+}
+
+/* ============================================================
+   [11] Mini Player — playlist Catalepsia, 10s preview,
+        spectrum analyzer borravino+blanco
+   ============================================================ */
+function initMiniPlayer() {
+  var tracks = [
+    { name: 'Catalepsia I', src: 'assets/audio/catalepsia-01.mp3' },
+    { name: 'Catalepsia II', src: 'assets/audio/catalepsia-02.mp3' },
+    { name: 'Catalepsia III', src: 'assets/audio/catalepsia-03.mp3' },
+    { name: 'Catalepsia IV', src: 'assets/audio/catalepsia-04.mp3' },
+    { name: 'Catalepsia V', src: 'assets/audio/catalepsia-05.mp3' },
+    { name: 'Catalepsia VI', src: 'assets/audio/catalepsia-06.mp3' },
+    { name: 'Catalepsia VII', src: 'assets/audio/catalepsia-07.mp3' },
+    { name: 'Catalepsia VIII', src: 'assets/audio/catalepsia-08.mp3' },
+    { name: 'Catalepsia IX', src: 'assets/audio/catalepsia-09.mp3' },
+    { name: 'Catalepsia X', src: 'assets/audio/catalepsia-10.mp3' }
+  ];
+  var cur = 0, playing = false, muted = false;
+  var audio, actx, analyser, srcNode;
+  var cvs, cx, animId;
+
+  var el = document.createElement('div');
+  el.className = 'mini-player';
+  el.innerHTML =
+    '<div class="mini-player__info">' +
+      '<span class="mini-player__track">' + tracks[0].name + '</span>' +
+      '<span class="mini-player__time">0:00</span>' +
+    '</div>' +
+    '<canvas class="mini-player__spectrum" width="204" height="50"></canvas>' +
+    '<div class="mini-player__controls">' +
+      '<button class="mini-player__btn mp-play" title="Play">▶</button>' +
+      '<button class="mini-player__btn mp-stop" title="Stop">■</button>' +
+      '<button class="mini-player__btn mp-mute" title="Silenciar">🔊</button>' +
+    '</div>';
+  document.body.appendChild(el);
+
+  cvs = el.querySelector('.mini-player__spectrum');
+  cx = cvs.getContext('2d');
+  var nameEl = el.querySelector('.mini-player__track');
+  var timeEl = el.querySelector('.mini-player__time');
+  var playBtn = el.querySelector('.mp-play');
+  var stopBtn = el.querySelector('.mp-stop');
+  var muteBtn = el.querySelector('.mp-mute');
+
+  function setup() {
+    if (audio) return;
+    audio = new Audio();
+    audio.volume = 0.25;
+    audio.crossOrigin = 'anonymous';
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 128;
+    srcNode = actx.createMediaElementSource(audio);
+    srcNode.connect(analyser);
+    analyser.connect(actx.destination);
+    audio.addEventListener('timeupdate', tick);
+    audio.addEventListener('ended', next);
+    audio.addEventListener('error', next);
+  }
+
+  function load(i) {
+    cur = i % tracks.length;
+    audio.src = tracks[cur].src;
+    nameEl.textContent = tracks[cur].name;
+    timeEl.textContent = '0:00';
+  }
+
+  function tick() {
+    if (audio.currentTime >= 10) { next(); return; }
+    var s = Math.floor(audio.currentTime);
+    timeEl.textContent = '0:' + (s < 10 ? '0' : '') + s;
+  }
+
+  function next() {
+    load(cur + 1);
+    if (playing) audio.play();
+  }
+
+  function draw() {
+    animId = requestAnimationFrame(draw);
+    var buf = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(buf);
+    cx.clearRect(0, 0, cvs.width, cvs.height);
+    var w = cvs.width / buf.length;
+    for (var i = 0; i < buf.length; i++) {
+      var h = (buf[i] / 255) * cvs.height;
+      var x = i * w;
+      var g = cx.createLinearGradient(0, cvs.height, 0, cvs.height - h);
+      g.addColorStop(0, 'rgba(74,15,13,.2)');
+      g.addColorStop(0.6, 'rgba(74,15,13,.7)');
+      g.addColorStop(1, 'rgba(200,204,208,.9)');
+      cx.fillStyle = g;
+      cx.fillRect(x, cvs.height - h, w - 1, h);
+    }
+  }
+
+  playBtn.onclick = function () {
+    setup();
+    if (actx.state === 'suspended') actx.resume();
+    if (playing) {
+      audio.pause();
+      playBtn.textContent = '▶';
+      cancelAnimationFrame(animId);
+    } else {
+      if (!audio.src) load(cur);
+      audio.play();
+      playBtn.textContent = '❚❚';
+      draw();
+    }
+    playing = !playing;
+  };
+
+  stopBtn.onclick = function () {
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+    playing = false;
+    playBtn.textContent = '▶';
+    cancelAnimationFrame(animId);
+    cx.clearRect(0, 0, cvs.width, cvs.height);
+    timeEl.textContent = '0:00';
+  };
+
+  muteBtn.onclick = function () {
+    if (!audio) return;
+    muted = !muted;
+    audio.muted = muted;
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+  };
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -404,6 +577,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initFog();
   initShareButtons();
   initNavScroll();
+  initMiniPlayer();
 
   // Visit counter
   var counterEl = document.getElementById('visitCounter');

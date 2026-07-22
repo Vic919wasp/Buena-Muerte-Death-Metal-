@@ -163,6 +163,70 @@ body::before {
 
 /* Subnav dropdown estilo Dimmu (Merch / Links) */
 .nav-track { display: contents; }
+
+/* Mini Player */
+.mini-player {
+  position: fixed;
+  top: 80px;
+  left: 1rem;
+  z-index: 40;
+  background: rgba(5, 6, 7, .82);
+  border: 1px solid rgba(31, 34, 37, .6);
+  border-radius: 6px;
+  padding: .6rem .8rem;
+  width: 220px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.mini-player__info {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--fuente-sans);
+  font-size: .55rem;
+  letter-spacing: .12em;
+  color: var(--hueso);
+  margin-bottom: .4rem;
+}
+.mini-player__track {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 140px;
+}
+.mini-player__time { color: var(--bronce-claro); }
+.mini-player__spectrum {
+  width: 100%;
+  height: 50px;
+  background: rgba(0, 0, 0, .3);
+  border-radius: 3px;
+  display: block;
+}
+.mini-player__controls {
+  display: flex;
+  gap: .4rem;
+  margin-top: .4rem;
+}
+.mini-player__btn {
+  flex: 1;
+  padding: .35rem;
+  background: transparent;
+  border: 1px solid var(--linea);
+  color: var(--hueso);
+  font-size: .65rem;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all .25s;
+  line-height: 1;
+  text-align: center;
+}
+.mini-player__btn:hover {
+  border-color: var(--rojo-vivo);
+  color: var(--rojo-vivo);
+}
+@media (max-width: 880px) {
+  .mini-player { top: 60px; left: .5rem; width: 180px; padding: .5rem .6rem; }
+  .mini-player__spectrum { height: 40px; }
+}
 .subnav { position: relative; }
 .subnav__panel {
   position: absolute; top: 100%; left: 50%;
@@ -818,13 +882,9 @@ body::before {
   }
   .nav-track {
     display: flex;
-    animation: navScroll 35s linear infinite;
+    cursor: grab;
   }
-  .nav-track:hover { animation-play-state: paused; }
-  @keyframes navScroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
+  .nav-track:active { cursor: grabbing; }
   .header-cta { display: none; }
   .lang-selector { display: flex; }
   .disc { grid-template-columns: 1fr; }
