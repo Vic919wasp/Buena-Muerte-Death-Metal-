@@ -588,8 +588,8 @@ body::before {
   border: none; cursor: pointer; transition: opacity .25s;
 }
 .video-share-btn svg { fill: #fff; width: 14px; height: 14px; }
-.video-share-btn--wa { background: #25D366; }
-.video-share-btn--fb { background: #1877F2; }
+.video-share-btn--wa { background: #4a0f0d; }
+.video-share-btn--fb { background: #4a0f0d; }
 .video-share-btn:hover { opacity: .8; }
 
 /* [08c] DISCOGRAPHY SHARE BUTTON */
