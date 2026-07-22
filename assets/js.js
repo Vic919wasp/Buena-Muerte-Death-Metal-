@@ -440,6 +440,9 @@ document.addEventListener('DOMContentLoaded', function () {
   initShareButtons();
   initNavScroll();
 
+  // Reset scroll al tope después de la animación casino
+  setTimeout(function () { window.scrollTo(0, 0); }, 1200);
+
   // Visit counter
   var counterEl = document.getElementById('visitCounter');
   if (counterEl) {
