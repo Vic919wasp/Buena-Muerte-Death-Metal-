@@ -25,6 +25,7 @@
            transporte (string, opcional), descripcion (string, opcional).
            Si link está vacío, se muestra WhatsApp. */
 var WHATSAPP_CANTANTE = '5491164377706';
+var REDES_FOOTER = '\n\n🔗 *Seguinos en:*\n🌐 buena-muerte-death-metal.onrender.com\n🎵 open.spotify.com/intl-es/artist/5q9MTB7bYNx20VzAsYTblL\n🎬 youtube.com/results?search_query=buena+muerte+death+metal\n📸 instagram.com/buena.muerte';
 var FECHAS = [
   {
     dia: '02',
@@ -140,7 +141,7 @@ function renderFechas() {
     if (f.link && f.link !== '#') {
       cta = '<a href="' + f.link + '" target="_blank" rel="noopener" class="tour-card__btn">ENTRADAS ›</a>';
     } else {
-      var waUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent('Hola Favio!, quiero entradas para el show de ' + f.lugar + ' ' + f.dia + '/' + f.mes + '/' + f.anio + '!!!');
+      var waUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent('Hola Favio!, quiero entradas para el show de ' + f.lugar + ' ' + f.dia + '/' + f.mes + '/' + f.anio + '!!!' + REDES_FOOTER);
       cta = '<a href="' + waUrl + '" target="_blank" rel="noopener" class="tour-card__btn tour-card__btn--wa">CONSULTAR POR WHATSAPP ›</a>';
     }
     var fotos = '';
@@ -167,7 +168,7 @@ function renderFechas() {
       (f.descripcion ? '\n📝 ' + f.descripcion + '\n' : '') +
       (f.transporte ? '\n🚌 ' + f.transporte + '\n' : '') +
       (f.mapa ? '\n🗺️ Ver ubicación: ' + mapaLink + '\n' : '') +
-      '\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE;
+      '\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE + REDES_FOOTER;
     var shareUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(shareText);
     var share = '<a href="#" class="tour-card__btn tour-card__btn--wa" onclick="shareFecha(event, ' + i + ')">COMPARTIR FECHA ›</a>';
     return '<div class="tour-card">' +
@@ -225,6 +226,10 @@ function generarFlyer(imageUrl, info, mapaUrl) {
       var s5 = Math.round(W * 0.032);
       ctx.font = s5 + 'px sans-serif';
       ctx.fillText('🎫 Entradas / Info: wa.me/' + WHATSAPP_CANTANTE, W / 2, y += s2 * 1.4);
+      var s6 = Math.round(W * 0.024);
+      ctx.font = s6 + 'px sans-serif';
+      ctx.fillStyle = '#aaa';
+      ctx.fillText('buena-muerte-death-metal.onrender.com · @buena.muerte', W / 2, y += s2 * 1.2);
       canvas.toBlob(function (blob) {
         if (!blob) { reject(new Error('toBlob failed')); return; }
         resolve(new File([blob], 'flyer-' + info.dia + info.mes + '.jpg', { type: 'image/jpeg' }));
@@ -246,7 +251,7 @@ function shareFecha(e, idx) {
     (f.descripcion ? '\n📝 ' + f.descripcion : '') +
     (f.transporte ? '\n🚌 ' + f.transporte : '') +
     (mapaLink ? '\n🗺️ Ver ubicación: ' + mapaLink : '') +
-    '\n\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE;
+    '\n\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE + REDES_FOOTER;
   var waUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(msgText);
 
   if (!imgUrl) {
