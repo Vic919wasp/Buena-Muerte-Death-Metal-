@@ -14,12 +14,13 @@ SITE_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")
 
 
 def _run(cmd, cwd=SITE_ROOT):
+    env = os.environ.copy()
+    env["PYTHONIOENCODING"] = "utf-8"
     result = subprocess.run(
-        cmd, shell=True, cwd=cwd, capture_output=True, timeout=30
+        cmd, shell=True, cwd=cwd, capture_output=True, timeout=30, env=env,
+        encoding="utf-8", errors="replace"
     )
-    out = result.stdout.decode("utf-8", errors="replace").strip() if result.stdout else ""
-    err = result.stderr.decode("utf-8", errors="replace").strip() if result.stderr else ""
-    return result.returncode == 0, out, err
+    return result.returncode == 0, (result.stdout or "").strip(), (result.stderr or "").strip()
 
 
 # [002] PUBLICAR

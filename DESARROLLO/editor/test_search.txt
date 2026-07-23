@@ -1,5 +1,0 @@
-{'title': 'Buena Muerte — Brutal Death Metal from Florencio Varela, AR', 'url': 'https://sametalindex.com/band/buena-muerte'}
-{'title': 'Buena Muerte Death Metal Argentino - Facebook', 'url': 'https://www.facebook.com/Buenamuertedeathtrio/mentions/'}
-{'title': 'Buena Muerte - Death Metal (@buena.muerte) - Instagram', 'url': 'https://www.instagram.com/buena.muerte/'}
-{'title': 'BUENA MUERTE DEATH METAL OFICIAL - YouTube', 'url': 'https://www.youtube.com/@buenamuertedeathmetalofici951'}
-{'title': 'Buena Muerte - Encyclopaedia Metallum: The Metal Archives', 'url': 'https://www.metal-archives.com/bands/Buena_Muerte/3540444029'}
