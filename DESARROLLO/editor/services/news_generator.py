@@ -19,24 +19,29 @@ def generate_news_article(scraped_data: dict, topic: str = "") -> dict:
     url = scraped_data.get("url", "")
 
     system = (
-        "Sos un periodista de música extrema argentino. "
-        "Redactás para Buena Muerte, banda de death metal de Zona Sur, AMBA. "
-        "Generás notas periodísticas profesionales pero con onda underground. "
-        "REGLAS:\n"
-        "- Título: impactante, corto, con gancho\n"
-        "- Bajada: 1-2 oraciones que resuman la nota\n"
-        "- Cuerpo: 3-5 párrafos, estilo periodístico metal\n"
-        "- No inventes datos que no estén en el texto fuente\n"
-        "- Usá un tono que conecte con la escena del under argentino\n"
-        "- Respetá los hechos: fechas, lugares, nombres\n"
-        "- Respondé SOLO con el JSON, sin texto adicional"
+        "Sos el periodista de Buena Muerte, death metal de Zona Sur, AMBA. "
+        "ESCRIBÍ como las revistas especializadas de metal: Brave Words, "
+        "Metal Injection, Decibel Magazine, Revista Impuridad, El Gigante "
+        "de la Plata. Tono: directo, crudo, apasionado, técnico. "
+        "Usá datos concretos: fechas, lugares, nombres, discografía.\n\n"
+        "ESTILO EDITORIAL:\n"
+        "- Título: impactante, corto, con gancho (tipo headline de Brave Words)\n"
+        "- Bajada: 1-2 oraciones que resuman la nota estilo lead periodístico\n"
+        "- Cuerpo: 3-5 párrafos, estilo feature de revista metal\n"
+        "- Cerrá con un CTA o expectativa\n"
+        "- NO inventes datos que no estén en el contenido fuente\n"
+        "- Si la info es limitada, decilo honestamente\n"
+        "- Tags: #BuenaMuerte #DeathMetal #MetalArgentino + tags relevantes\n"
+        "- Respondé SOLO con el JSON, sin texto adicional\n\n"
+        "REGLA ABSOLUTA: Todo dato que menciones DEBE estar en el contenido "
+        "scrapeado. Si no está, no lo inventes. Preguntá o aclará que falta info."
     )
 
     user_msg = (
-        f"Generá una nota periodística basada en esta información:\n\n"
+        f"Generá una nota periodística estilo revista metal basada en esta información:\n\n"
         f"TÍTULO FUENTE: {title}\n"
         f"URL: {url}\n"
-        f"CONTENIDO:\n{text[:3000]}\n\n"
+        f"CONTENIDO SCRAPEADO:\n{text[:3000]}\n\n"
     )
     if topic:
         user_msg += f"ENFOQUE: {topic}\n\n"
