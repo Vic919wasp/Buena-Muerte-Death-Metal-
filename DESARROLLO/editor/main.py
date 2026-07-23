@@ -1,7 +1,7 @@
 """
 CONTEXTO: Editor de contenido del sitio Buena Muerte. App PySide6/Qt
-          que permite gestionar tour, noticias, banda, newsletter y
-          publicar cambios al sitio desplegado en Render.com.
+          que permite gestionar tour, noticias, banda, newsletter,
+          pipeline de contenido (web→AI→publicar) y publicar al sitio.
 ÍNDICE DE NAVEGACIÓN
 [001] IMPORTS / CONFIG      - línea 12
 [002] VENTANA PRINCIPAL     - línea 25
@@ -25,6 +25,7 @@ from tabs.contact_tab import ContactTab
 from tabs.newsletter_tab import NewsletterTab
 from tabs.settings_tab import SettingsTab
 from tabs.ai_tab import AITab
+from tabs.content_tab import ContentPipelineTab
 
 
 # [002] VENTANA PRINCIPAL
@@ -50,6 +51,7 @@ class MainWindow(QMainWindow):
         tabs = QTabWidget()
         tabs.addTab(TourTab(), "Fechas")
         tabs.addTab(NewsTab(), "Noticias")
+        tabs.addTab(ContentPipelineTab(), "Pipeline")
         tabs.addTab(VideosTab(), "Videos")
         tabs.addTab(BandTab(), "Banda")
         tabs.addTab(ContactTab(), "Contacto")

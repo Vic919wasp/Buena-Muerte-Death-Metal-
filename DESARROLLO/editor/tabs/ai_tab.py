@@ -170,10 +170,14 @@ class AITab(QWidget):
 
         chat_row = QHBoxLayout()
         self.chat_input = QLineEdit()
-        self.chat_input.setPlaceholderText("Escribi tu pregunta...")
+        self.chat_input.setPlaceholderText("Escribi tu pregunta o pega una URL...")
         self.chat_input.returnPressed.connect(self._send_chat)
         self.chat_input.textChanged.connect(self._update_token_count)
         chat_row.addWidget(self.chat_input, 1)
+        self.web_btn = QPushButton("Buscar web")
+        self.web_btn.setToolTip("Scrapea la URL que escribas y la pasa como contexto a la AI")
+        self.web_btn.clicked.connect(self._send_chat)
+        chat_row.addWidget(self.web_btn)
         self.send_btn = QPushButton("Enviar")
         self.send_btn.clicked.connect(self._send_chat)
         chat_row.addWidget(self.send_btn)
@@ -278,21 +282,34 @@ class AITab(QWidget):
             return
         text = text[:500]
         import re
+        web_context = ""
+
         urls = re.findall(r'https?://\S+', text)
         if not urls:
             urls = re.findall(r'[\w.-]+\.(?:com|org|net|ar|onrender)\S*', text)
-        web_context = ""
         if urls:
             for url in urls[:2]:
                 if not url.startswith("http"):
                     url = "https://" + url
                 self.chat_output.append(f"[Scrapeando {url}...]\n")
-                web_context += ai_service.scrape_url(url) + "\n"
+                scraped = ai_service.scrape_url(url)
+                web_context += scraped + "\n"
             text = re.sub(r'https?://\S+', '', text)
             text = re.sub(r'[\w.-]+\.(?:com|org|net|ar|onrender)\S*', '', text)
             text = text.strip()
             if not text:
-                text = "Armame una bio completa basada en la info scrapeada."
+                text = "Analizá la info scrapeada y respondé."
+
+        web_keywords = ["web", "sitio", "página", "pagina", "buscar", "escrapea", "scrapear", "busca"]
+        is_web_request = any(k in text.lower() for k in web_keywords)
+        if is_web_request and not web_context:
+            site_url = "https://buena-muerte-death-metal.onrender.com"
+            self.chat_output.append(f"[Scrapeando {site_url}...]\n")
+            web_context = ai_service.scrape_url(site_url) + "\n"
+            text = re.sub(r'(?:escrapea|scrapear|busca|buscar)\s*(?:en\s*(?:la\s*)?web\s*)?', '', text, flags=re.IGNORECASE).strip()
+            if not text:
+                text = "Analizá la info del sitio y respondé."
+
         self.chat_input.clear()
         self.chat_output.append(f"Tu: {text}\n")
         self.chat_history.append({"role": "user", "content": text})
@@ -300,12 +317,15 @@ class AITab(QWidget):
         system = (
             "Sos el asistente de Buena Muerte, death metal, Zona Sur, AMBA. "
             "Cantante: Favio Leguizamón. Sello: Macabre Records. "
-            "WhatsApp: 5491164377706. Sé conciso y directo."
+            "WhatsApp: 5491164377706. "
+            "REGLA IMPORTANTE: Si tenés info scrapeada de la web, usala como "
+            "fuente principal. NO inventes datos que no estén en la info scrapeada. "
+            "Si no tenés info scrapeada, aclará que no encontraste datos."
         )
         if ctx:
             system += f" Escena ARG: {ctx}"
         if web_context:
-            system += f"\n\nINFO SCRAPEADA DE LA WEB (usá esta info como base, no inventes):\n{web_context[:2000]}"
+            system += f"\n\nINFO SCRAPEADA DE LA WEB:\n{web_context[:2500]}"
         messages = [{"role": "system", "content": system}] + self.chat_history[-5:]
         total_tokens = self._estimate_tokens(messages)
         self.token_label.setText(str(total_tokens))
