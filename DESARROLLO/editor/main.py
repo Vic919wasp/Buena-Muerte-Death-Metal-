@@ -9,6 +9,7 @@ CONTEXTO: Editor de contenido del sitio Buena Muerte. App PySide6/Qt
 """
 import sys
 import os
+from datetime import datetime
 
 # [001] IMPORTS / CONFIG
 from PySide6.QtWidgets import (
@@ -114,8 +115,17 @@ def setup_theme(app):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    setup_theme(app)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())
+    import traceback
+    log_path = os.path.join(os.path.dirname(__file__), "error.log")
+    try:
+        app = QApplication(sys.argv)
+        setup_theme(app)
+        window = MainWindow()
+        window.show()
+        sys.exit(app.exec())
+    except Exception:
+        tb = traceback.format_exc()
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(f"\n{'='*60}\n{datetime.now().isoformat()}\n{tb}\n")
+        print(tb)
+        raise
