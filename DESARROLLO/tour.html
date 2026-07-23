@@ -9,7 +9,8 @@
      [002] HEADER / NAV        - línea 29
      [003] TOUR + SIDEBAR      - línea 57
      [004] ICARUS MUSIC SIDEBAR - línea 76
-     [005] FOOTER              - línea 98
+     [005] MACABRA RECORDS     - línea 97
+     [006] FOOTER              - línea 117
      ============================================================ -->
 <!DOCTYPE html>
 <html lang="es-AR">
@@ -18,10 +19,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gira — Buena Muerte</title>
 <meta name="description" content="Fechas de Buena Muerte en vivo. Zona Sur, AMBA y festivals.">
+<meta property="og:title" content="Gira — Buena Muerte">
+<meta property="og:description" content="Fechas de Buena Muerte en vivo. Zona Sur, AMBA y festivals.">
+<meta property="og:image" content="assets/buena-muerte-logo.jpeg">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css.css">
+<link rel="icon" href="assets/buena-muerte-logo.png" type="image/png">
 </head>
 <body>
 <canvas id="sparkles"></canvas>
@@ -67,11 +73,8 @@
           <p class="tour-empty__sub">Seguinos en <a href="https://instagram.com/buena.muerte" target="_blank" rel="noopener">@buena.muerte</a> para el próximo show.</p>
         </div>
 
-        <!-- Tabla poblada por assets/js.js desde FECHAS[] -->
-        <table class="tour-table" id="tourTable">
-          <thead><tr><th>Día</th><th>Lugar / Ciudad</th><th></th></tr></thead>
-          <tbody id="tourBody"></tbody>
-        </table>
+        <!-- Cards pobladas por assets/js.js desde FECHAS[] -->
+        <div class="tour-cards" id="tourTable" style="display:none"></div>
       </div>
 
       <!-- [004] ICARUS MUSIC SIDEBAR -->
@@ -91,6 +94,24 @@
         </div>
         <a href="https://icarusmusicstore.com" target="_blank" rel="noopener" class="btn btn--ghost tour-sidebar__btn">Icarus Music Store ›</a>
       </aside>
+
+      <!-- [005] MACABRA RECORDS SIDEBAR -->
+      <div class="tour-sidebar__macabra">
+        <h2 class="tour-sidebar__title">Macabra Records</h2>
+        <div class="tour-sidebar__fb">
+          <iframe
+            src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FMacabraRecordsProducciones&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
+            width="340"
+            height="500"
+            style="border:none;overflow:hidden"
+            scrolling="yes"
+            frameborder="0"
+            allowfullscreen="true"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            loading="lazy"
+            title="Facebook — Macabra Records"></iframe>
+        </div>
+      </div>
 
     </div>
   </div>

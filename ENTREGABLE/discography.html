@@ -1,27 +1,33 @@
 ﻿<!-- ============================================================
-     CONTEXTO: Página de Newsletter. Form de suscripción fake sin
-               backend (data-fake). El handler está en assets/js.js
-               y al enviar muestra mensaje de confirmación + resetea.
-               Reemplazar por integración real (Mailchimp, Buttondown,
-               etc.) cuando se defina el provider.
+     CONTEXTO: Página de Discography. Layout Dimmu: cover grande
+               izquierda + info derecha, lista de tracks opcional y
+               reproductor embebido Spotify con carga lazy. Dos
+               lanzamientos: Catalepsia (2024 LP) y Dios Es Sádico
+               (2018 EP). Reemplazar URLs de Spotify y tracks cuando
+               se confirmen.
      ============================================================
      ÍNDICE DE NAVEGACIÓN
-     [001] HEAD / META         - línea 16
-     [002] HEADER / NAV        - línea 29
-     [003] NEWSLETTER FORM     - línea 57
-     [004] FOOTER              - línea 69
+     [001] HEAD / META         - línea 17
+     [002] HEADER / NAV        - línea 30
+     [003] DISCOGRAPHY LIST    - línea 58
+     [004] FOOTER              - línea 120
      ============================================================ -->
 <!DOCTYPE html>
 <html lang="es-AR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Novedades — Buena Muerte</title>
-<meta name="description" content="Suscribite al newsletter de Buena Muerte: lanzamientos y shows antes que nadie.">
+<title>Discografía — Buena Muerte</title>
+<meta name="description" content="Catalepsia (2024) y Dios Es Sádico (2018) — Buena Muerte.">
+<meta property="og:title" content="Discografía — Buena Muerte">
+<meta property="og:description" content="Catalepsia (2024) y Dios Es Sádico (2018) — Buena Muerte.">
+<meta property="og:image" content="assets/buena-muerte-logo.jpeg">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css.css">
+<link rel="icon" href="assets/buena-muerte-logo.png" type="image/png">
 </head>
 <body>
 <canvas id="sparkles"></canvas>
@@ -39,7 +45,7 @@
       <a href="news.html">Noticias</a>
       <a href="tour.html">Gira</a>
       <a href="video.html">Videos</a>
-      <a href="discography.html">Discografía</a>
+      <a href="discography.html" class="is-active">Discografía</a>
       <a href="band.html">Banda</a>
       <a href="contact.html">Contacto</a>
     </div>
@@ -48,22 +54,70 @@
   </div>
 </header>
 
-<section class="section page-section" id="newsletter">
+<section class="section page-section" id="discography">
   <div class="container">
-    <span class="section__eyebrow" data-i18n="newsletter_page_eyebrow">§ Novedades</span>
-    <h1 class="section__title" data-i18n="newsletter_page_title">Novedades</h1>
-    <p class="section__intro" data-i18n="newsletter_page_intro">Suscribite para recibir lanzamientos, anuncios de shows y noticias directamente a tu inbox. Sin spam — solo muerte.</p>
+    <span class="section__eyebrow" data-i18n="disc_page_eyebrow">§ Discografía</span>
+    <h1 class="section__title" data-i18n="disc_page_title">Discografía</h1>
+    <p class="section__intro" data-i18n="disc_page_intro">Dos lanzamientos oficiales. Once años de mutaciones en el sur del Gran Buenos Aires forjando un death metal crudo, honesto y directo.</p>
     <span class="section__rule"></span>
 
-    <!-- [003] NEWSLETTER FORM -->
-    <form class="newsletter-form" id="newsletterForm">
-      <p>Dejanos tu email y entrás en el círculo. Cada novedad compartida acá primero.</p>
-      <div class="form-row">
-        <input type="email" name="email" placeholder="tu@email.com" required aria-label="Email">
-        <button type="submit">Subscribirse ›</button>
-      </div>
-      <p class="newsletter-form__note"></p>
-    </form>
+    <!-- [003] DISCOGRAPHY LIST -->
+    <div class="disc-grid">
+
+      <!-- CATALEPSIA -->
+      <article class="disc">
+        <div class="disc__cover">
+          <img src="assets/tapa-catalepsia.jpg" alt="Catalepsia — cover">
+        </div>
+        <div class="disc__info">
+          <header class="disc__head">
+            <h3>Catalepsia</h3>
+            <span class="disc__tipo">Álbum completo</span>
+            <span class="disc__anio">2024 · 02·08·2024</span>
+          </header>
+          <p class="disc__notes">El álbum debut completo de Buena Muerte. Once tracks de death metal del sur del Gran Buenos Aires. Publicado el 2 de agosto de 2024.</p>
+          <p class="disc__notes"><em>Canciones destacadas en Spotify:</em> Intro · Crónica de un Asesino · Insurrección · Catalepsia Muerta Dos Veces · Pedófilo Mental.</p>
+          <div class="disc__player">
+            <iframe
+              data-spotify="catalepsia"
+              loading="lazy"
+              title="Catalepsia en Spotify"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+          </div>
+          <div class="disc__actions">
+            <button class="btn btn--share" data-share-url="https://open.spotify.com/album/0nX9lEtTJa4RyqgMglpKzX" data-share-title="Catalepsia — Buena Muerte" aria-label="Compartir">Compartir ›</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- DIOS ES SÁDICO -->
+      <article class="disc">
+        <div class="disc__cover">
+          <img src="assets/tapa-dios-es-sadico.jpg" alt="Dios Es Sádico — cover">
+        </div>
+        <div class="disc__info">
+          <header class="disc__head">
+            <h3>Dios Es Sádico</h3>
+            <span class="disc__tipo">EP</span>
+            <span class="disc__anio">2018</span>
+          </header>
+          <p class="disc__notes">El primer material de Buena Muerte. Un EP con temas de distintas épocas de la banda, recopilando canciones escritas antes de la formación del trío actual.</p>
+          <div class="disc__player">
+            <iframe
+              data-spotify="diosEsSadico"
+              loading="lazy"
+              title="Dios Es Sádico en Spotify"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+          </div>
+          <div class="disc__actions">
+            <button class="btn btn--share" data-share-url="https://open.spotify.com/album/1j8MNMHY4KHASmOtpKXXCT" data-share-title="Dios Es Sádico — Buena Muerte" aria-label="Compartir">Compartir ›</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+
   </div>
 </section>
 

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: buena-muerte
+    runtime: static
+    branch: master
+    buildCommand: echo "Static site — no build needed"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /
+        destination: /index.html

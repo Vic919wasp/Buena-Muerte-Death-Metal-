@@ -300,6 +300,12 @@ body::before {
   display: block;
 }
 
+}
+.section__title {
+  font-family: var(--fuente-display);
+  font-size: 2.6rem;
+  font-weight: 600;
+  color: var(--hueso);
   margin-bottom: 2.5rem;
 }
 .section__title b { color: var(--rojo-vivo); }
@@ -465,6 +471,117 @@ body::before {
 .tour-table td.btt a { font-family: var(--fuente-sans); font-size: .58rem; letter-spacing: .26em; text-transform: uppercase; color: var(--bronce-claro); border: 1px solid var(--bronce); padding: .55rem 1rem; transition: all .2s; }
 .tour-table td.btt a:hover { background: var(--rojo-sangre); color: var(--hueso); }
 
+/* [07a] TOUR CARDS */
+.tour-cards { display: none; }
+.tour-card {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--linea);
+}
+.tour-card__fecha {
+  font-family: var(--fuente-display);
+  font-size: 1.4rem;
+  color: var(--rojo-vivo);
+  font-weight: 700;
+  text-align: center;
+}
+.tour-card__fecha span {
+  display: block;
+  font-family: var(--fuente-sans);
+  font-size: .55rem;
+  letter-spacing: .25em;
+  color: var(--bronce-claro);
+  margin-top: .25rem;
+}
+.tour-card__lugar {
+  font-family: var(--fuente-display);
+  font-size: 1.05rem;
+  color: var(--hueso);
+  margin-bottom: .8rem;
+}
+.tour-card__lugar span {
+  display: block;
+  font-family: var(--fuente-sans);
+  font-size: .58rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--bronce-claro);
+  margin-top: .35rem;
+}
+.tour-card__btn {
+  display: inline-block;
+  font-family: var(--fuente-sans);
+  font-size: .58rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--bronce-claro);
+  border: 1px solid var(--bronce);
+  padding: .55rem 1rem;
+  transition: all .2s;
+  margin-bottom: 1rem;
+}
+.tour-card__btn:hover { background: var(--rojo-sangre); color: var(--hueso); }
+.tour-card__btn--wa { border-color: #25d366; color: #25d366; }
+.tour-card__btn--wa:hover { background: #25d366; color: #fff; }
+.tour-card__fotos {
+  display: flex;
+  gap: .8rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.tour-card__fotos a { flex: 1 1 100%; display: block; }
+.tour-card__fotos img {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  object-fit: contain;
+  border: 1px solid var(--linea);
+  border-radius: 2px;
+  filter: grayscale(.1);
+  transition: filter .3s, border-color .3s;
+}
+.tour-card__fotos img:hover { filter: grayscale(0); border-color: var(--bronce); }
+.tour-card__mapa {
+  margin-bottom: 1rem;
+  border: 1px solid var(--linea);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.tour-card__mapa iframe {
+  width: 100%;
+  height: 200px;
+  border: none;
+  filter: grayscale(.6) contrast(1.1);
+}
+.tour-card__mapa-link {
+  display: block;
+  font-family: var(--fuente-sans);
+  font-size: .6rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--bronce-claro);
+  text-align: center;
+  padding: .4rem;
+  background: rgba(10,12,13,.7);
+  border-top: 1px solid var(--linea);
+  transition: color .2s;
+}
+.tour-card__mapa-link:hover { color: var(--hueso); }
+.tour-card__btn--share { border-color: #25d366; color: #25d366; margin-left: .5rem; }
+.tour-card__btn--share:hover { background: #25d366; color: #fff; }
+.tour-card__transporte {
+  font-family: var(--fuente-sans);
+  font-size: .7rem;
+  color: var(--bronce-claro);
+  letter-spacing: .05em;
+  padding: .5rem .8rem;
+  background: rgba(10,12,13,.5);
+  border-left: 2px solid var(--bronce);
+  margin-bottom: .5rem;
+}
+
 /* [07b] TOUR LAYOUT — 2 columns */
 .tour-layout { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: start; }
 .tour-layout .tour-wrap { max-width: none; }
@@ -507,6 +624,9 @@ body::before {
 .icarus-info__track { color: var(--bronce); font-style: italic; }
 .icarus-info__about { font-family: var(--fuente-serif); font-size: .8rem; color: var(--bronce-claro); line-height: 1.5; font-style: italic; }
 .tour-sidebar__btn { width: 100%; text-align: center; }
+.tour-sidebar__macabra { margin-top: 2rem; }
+.tour-sidebar__macabra .tour-sidebar__fb { background: var(--negro-1); border-radius: 4px; overflow: hidden; }
+.tour-sidebar__macabra .tour-sidebar__fb iframe { display: block; border: 0; }
 
 /* [08] DISCOGRAPHY */
 .disc-grid { display: grid; gap: 4rem; }
@@ -839,6 +959,10 @@ body::before {
   .news-sidebar { position: static; max-height: 500px; }
   .tour-layout { grid-template-columns: 1fr; }
   .tour-sidebar { position: static; max-height: 500px; }
+  .tour-card { grid-template-columns: 1fr; gap: .8rem; text-align: center; }
+  .tour-card__fecha { font-size: 1.2rem; }
+  .tour-card__fotos img { max-width: 100%; }
+  .tour-card__mapa iframe { height: 160px; }
   .news-item { grid-template-columns: 1fr; gap: 1rem; }
   .news-item__date { text-align: left; }
   .contact-grid { grid-template-columns: 1fr; }
@@ -852,7 +976,7 @@ body::before {
   .section__title { font-size: 2rem; }
   .section__intro { font-size: 1rem; }
   .bio p { font-size: 1.05rem; }
-  .footer__social { gap: 1rem; }
+  .site-footer__social { gap: 1rem; }
 }
 @media (max-width: 480px) {
   .member__photo { width: 180px; height: 180px; }

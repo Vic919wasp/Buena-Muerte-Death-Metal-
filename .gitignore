@@ -1,6 +1,9 @@
 .opencode/
 imagenes/
+__pycache__/
+venv/
 *.bak
-.csv
+*.csv
+*.pyc
 .DS_Store
 Thumbs.db

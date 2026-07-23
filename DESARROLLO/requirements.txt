@@ -1,0 +1,6 @@
+# Backend
+flask>=3.0
+flask-cors>=4.0
+
+# Editor
+PySide6>=6.7

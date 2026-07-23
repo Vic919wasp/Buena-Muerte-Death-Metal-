@@ -19,9 +19,32 @@
    [11] Nav scroll mobile     - línea 358
    ============================================================ */
 
-/* EDITAR acá para cargar fechas. Vacío = estado cero visible. */
+/* EDITAR acá para cargar fechas. Vacío = estado cero visible.
+   Campos: dia, mes, anio, lugar, ciudad, link (tickets, opcional),
+           fotos (array de URLs, opcional), mapa (URL embed Google Maps, opcional),
+           transporte (string, opcional), descripcion (string, opcional).
+           Si link está vacío, se muestra WhatsApp. */
+var WHATSAPP_CANTANTE = '5491164377706';
 var FECHAS = [
-  // { dia:'02', mes:'AGO', anio:'2026', lugar:'Reventados Bar', ciudad:'Quilmes, GBA', link:'#' }
+  {
+    dia: '02',
+    mes: 'AGO',
+    anio: '2026',
+    lugar: 'Reventados Bar',
+    ciudad: 'Quilmes, GBA',
+    link: '#',
+    transporte: 'Colectivo 98, Tren Roca',
+    fotos: ['assets/posts/post-01.jpg']
+  },
+  {
+    dia: '22',
+    mes: 'JUL',
+    anio: '2026',
+    lugar: 'GIER MUSIC CLUB',
+    ciudad: 'CABA',
+    mapa: 'https://maps.google.com/maps?q=av.+alvarez+thomas+1078+CABA&output=embed',
+    fotos: ['assets/tour/Fecha Brutal death en Gier.jpeg']
+  }
 ];
 
 /* ============================================================
@@ -105,19 +128,89 @@ function initSmoothScroll() {
    ============================================================ */
 function renderFechas() {
   var empty = qs('#tourEmpty');
-  var table = qs('#tourTable');
-  var body  = qs('#tourBody');
+  var container = qs('#tourTable');
   var head  = qs('#tourHeader');
-  if (!empty || !table) { return; }
+  if (!empty || !container) { return; }
   if (!FECHAS.length) { return; }
   empty.style.display = 'none';
-  table.style.display = 'table';
+  container.style.display = 'block';
   if (head) { head.textContent = FECHAS.length + ' fecha' + (FECHAS.length === 1 ? '' : 's') + ' confirmada' + (FECHAS.length === 1 ? '' : 's'); }
-  body.innerHTML = FECHAS.map(function (f) {
-    return '<tr><td class="dia">' + f.dia + '<br><span style="font-size:.55rem;letter-spacing:.25em;color:var(--bronce);">' + (f.mes || '') + ' ' + (f.anio || '') + '</span></td>' +
-           '<td class="lugar">' + f.lugar + '<span>' + (f.ciudad || '') + '</span></td>' +
-           '<td class="btt"><a href="' + (f.link || '#') + '" target="_blank" rel="noopener">ENTRADAS ›</a></td></tr>';
+  container.innerHTML = FECHAS.map(function (f) {
+    var cta = '';
+    if (f.link && f.link !== '#') {
+      cta = '<a href="' + f.link + '" target="_blank" rel="noopener" class="tour-card__btn">ENTRADAS ›</a>';
+    } else {
+      var waUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent('Hola Favio!, quiero entradas para el show de ' + f.lugar + ' ' + f.dia + '/' + f.mes + '/' + f.anio + '!!!');
+      cta = '<a href="' + waUrl + '" target="_blank" rel="noopener" class="tour-card__btn tour-card__btn--wa">CONSULTAR POR WHATSAPP ›</a>';
+    }
+    var fotos = '';
+    if (f.fotos && f.fotos.length) {
+      fotos = '<div class="tour-card__fotos">' + f.fotos.map(function (url) {
+        return '<a href="' + url + '" target="_blank" rel="noopener"><img src="' + url + '" loading="lazy" alt="Promo ' + f.lugar + '"></a>';
+      }).join('') + '</div>';
+    }
+    var mapa = '';
+    if (f.mapa) {
+      var mapaLink = f.mapa.replace(/&output=embed/, '').replace(/output=embed&?/, '');
+      mapa = '<div class="tour-card__mapa">' +
+        '<iframe src="' + f.mapa + '" loading="lazy" allowfullscreen title="Ubicación de ' + f.lugar + '"></iframe>' +
+        '<a href="' + mapaLink + '" target="_blank" rel="noopener" class="tour-card__mapa-link">Abrir en Google Maps ↗</a>' +
+        '</div>';
+    }
+    var transporte = '';
+    if (f.transporte) {
+      transporte = '<div class="tour-card__transporte">Cómo llegar: ' + f.transporte + '</div>';
+    }
+    var shareText = '🎵 *' + f.lugar + '*\n' +
+      '📍 ' + (f.ciudad || '') + '\n' +
+      '📅 ' + f.dia + '/' + f.mes + '/' + f.anio + '\n' +
+      (f.descripcion ? '\n📝 ' + f.descripcion + '\n' : '') +
+      (f.transporte ? '\n🚌 ' + f.transporte + '\n' : '') +
+      (f.mapa ? '\n🗺️ Ver ubicación: ' + mapaLink + '\n' : '') +
+      '\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE;
+    var shareUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText);
+    var shareId = 'share_' + f.dia + '_' + (f.mes || '').replace(/\W/g, '');
+    var share = '<button class="tour-card__btn tour-card__btn--share" onclick="shareFecha(\'' + shareId + '\')">COMPARTIR FECHA ›</button>' +
+      '<input type="hidden" id="' + shareId + '_url" value="' + (f.fotos && f.fotos.length ? location.origin + '/' + f.fotos[0] : '') + '">' +
+      '<input type="hidden" id="' + shareId + '_text" value="' + encodeURIComponent(shareText) + '">' +
+      '<input type="hidden" id="' + shareId + '_wa" value="' + shareUrl + '">';
+    return '<div class="tour-card">' +
+      '<div class="tour-card__fecha"><b>' + f.dia + '</b><br><span>' + (f.mes || '') + ' ' + (f.anio || '') + '</span></div>' +
+      '<div class="tour-card__info">' +
+        '<div class="tour-card__lugar">' + f.lugar + '<span>' + (f.ciudad || '') + '</span></div>' +
+        cta + share + fotos + mapa + transporte +
+      '</div>' +
+    '</div>';
   }).join('');
+}
+
+/* Compartir fecha en 2 mensajes: primero imagen, luego texto */
+function shareFecha(id) {
+  var imgUrl = document.getElementById(id + '_url').value;
+  var text = decodeURIComponent(document.getElementById(id + '_text').value);
+  var waUrl = document.getElementById(id + '_wa').value;
+
+  if (navigator.share && navigator.canShare && imgUrl) {
+    fetch(imgUrl).then(function (r) { return r.blob(); }).then(function (blob) {
+      var ext = imgUrl.split('.').pop().toLowerCase();
+      var type = ext === 'png' ? 'image/png' : 'image/jpeg';
+      var file = new File([blob], 'flyer.' + ext, { type: type });
+      var shareImg = { files: [file] };
+      if (navigator.canShare(shareImg)) {
+        return navigator.share(shareImg);
+      }
+    }).then(function () {
+      setTimeout(function () { window.open(waUrl, '_blank'); }, 500);
+    }).catch(function () {
+      window.open(imgUrl, '_blank');
+      setTimeout(function () { window.open(waUrl, '_blank'); }, 800);
+    });
+  } else if (imgUrl) {
+    window.open(imgUrl, '_blank');
+    setTimeout(function () { window.open(waUrl, '_blank'); }, 800);
+  } else {
+    window.open(waUrl, '_blank');
+  }
 }
 
 /* ============================================================
@@ -175,6 +268,7 @@ function saveSubscribers(list) {
 function initNewsletter() {
   var form = qs('#newsletterForm');
   if (!form) return;
+  var API = 'http://127.0.0.1:5000';
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
     var input = qs('input[name="email"]', form);
@@ -184,21 +278,38 @@ function initNewsletter() {
       if (note) { note.textContent = 'Ingresá un email válido.'; note.style.color = '#c00'; }
       return;
     }
-    var subs = getSubscribers();
-    var exists = subs.some(function (s) { return s.email === email; });
-    if (exists) {
-      if (note) { note.textContent = 'Este email ya está suscrito.'; note.style.color = 'var(--bronce)'; }
+    fetch(API + '/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    }).then(function (r) { return r.json(); }).then(function (data) {
+      if (data.ok) {
+        if (note) {
+          note.textContent = '✔ Suscripto. Próximamente recibirás novedades de la banda. †';
+          note.style.color = '#4a0f0d';
+          note.classList.add('form-success');
+        }
+        form.reset();
+      } else {
+        if (note) { note.textContent = data.error || 'Error al suscribirse.'; note.style.color = '#c00'; }
+      }
+    }).catch(function () {
+      var subs = getSubscribers();
+      var exists = subs.some(function (s) { return s.email === email; });
+      if (exists) {
+        if (note) { note.textContent = 'Este email ya está suscrito.'; note.style.color = 'var(--bronce)'; }
+        form.reset();
+        return;
+      }
+      subs.push({ email: email, date: new Date().toISOString().split('T')[0] });
+      saveSubscribers(subs);
+      if (note) {
+        note.textContent = '✔ Suscripto. Próximamente recibirás novedades de la banda. †';
+        note.style.color = '#4a0f0d';
+        note.classList.add('form-success');
+      }
       form.reset();
-      return;
-    }
-    subs.push({ email: email, date: new Date().toISOString().split('T')[0] });
-    saveSubscribers(subs);
-    if (note) {
-      note.textContent = '✔ Suscripto. Próximamente recibirás novedades de la banda. †';
-      note.style.color = '#4a0f0d';
-      note.classList.add('form-success');
-    }
-    form.reset();
+    });
   });
 }
 
@@ -236,15 +347,6 @@ var currentVideoPlayer = null;
 var currentVideoThumb = null;
 
 function initVideoInline() {
-  // Precargar todos los videos de YouTube (ocultos)
-  document.querySelectorAll('.video-thumb[data-video]').forEach(function (el) {
-    var videoId = el.dataset.video;
-    var preload = document.createElement('div');
-    preload.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;';
-    preload.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '" allow="encrypted-media" style="width:1px;height:1px;"></iframe>';
-    document.body.appendChild(preload);
-  });
-
   // Bind click para play inline
   document.querySelectorAll('.video-thumb[data-video]').forEach(function (el) {
     if (el.dataset.bound) return;
@@ -431,15 +533,24 @@ document.addEventListener('DOMContentLoaded', function () {
   // Visit counter
   var counterEl = document.getElementById('visitCounter');
   if (counterEl) {
-    fetch('visits.json?t=' + Date.now())
+    var API = 'http://127.0.0.1:5000';
+    fetch(API + '/api/visit', { method: 'POST' })
       .then(function (r) { return r.json(); })
       .then(function (data) {
         counterEl.textContent = data.visits;
         localStorage.setItem('bm_visits', data.visits);
       })
       .catch(function () {
-        var count = parseInt(localStorage.getItem('bm_visits') || '1', 10);
-        counterEl.textContent = count;
+        fetch('visits.json?t=' + Date.now())
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            counterEl.textContent = data.visits;
+            localStorage.setItem('bm_visits', data.visits);
+          })
+          .catch(function () {
+            var count = parseInt(localStorage.getItem('bm_visits') || '1', 10);
+            counterEl.textContent = count;
+          });
       });
   }
 });
