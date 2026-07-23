@@ -59,7 +59,7 @@ def save_fechas(fechas):
     lines = []
     for i, f in enumerate(fechas):
         parts = []
-        for k in ["dia", "mes", "anio", "lugar", "ciudad", "link", "mapa", "transporte"]:
+        for k in ["dia", "mes", "anio", "lugar", "ciudad", "link", "mapa", "transporte", "descripcion"]:
             if k in f and f[k]:
                 parts.append(f"    {k}: '{f[k]}'")
         if f.get("fotos"):
