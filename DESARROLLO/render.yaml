@@ -4,7 +4,7 @@ services:
     runtime: static
     branch: master
     buildCommand: echo "Static site — no build needed"
-    staticPublishPath: .
+    staticPublishPath: ENTREGABLE
     routes:
       - type: rewrite
         source: /
