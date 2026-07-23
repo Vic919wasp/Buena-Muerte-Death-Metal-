@@ -180,10 +180,10 @@ function renderFechas() {
   }).join('');
 }
 
-/* Generar flyer compuesto: foto + barra de texto al pie */
-function generarFlyer(imageUrl, info) {
+/* Generar flyer compuesto: foto + barra de texto al pie + mapa */
+function generarFlyer(imageUrl, info, mapaUrl) {
   var W = 1080, H = Math.round(W * 1.35);
-  var BAR_H = Math.round(H * 0.25);
+  var BAR_H = Math.round(H * 0.30);
   var canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H;
   var ctx = canvas.getContext('2d');
@@ -196,23 +196,35 @@ function generarFlyer(imageUrl, info) {
       if (imgR > canR) { sh = img.height; sw = sh * canR; sx = (img.width - sw) / 2; sy = 0; }
       else { sw = img.width; sh = sw / canR; sx = 0; sy = (img.height - sh) / 2; }
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
-      ctx.fillStyle = 'rgba(0,0,0,0.7)';
+      ctx.fillStyle = 'rgba(0,0,0,0.75)';
       ctx.fillRect(0, H - BAR_H, W, BAR_H);
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'center';
-      var y = H - BAR_H + Math.round(H * 0.04);
-      var s1 = Math.round(W * 0.05);
+      var y = H - BAR_H + Math.round(H * 0.035);
+      var s1 = Math.round(W * 0.07);
       ctx.font = 'bold ' + s1 + 'px sans-serif';
       ctx.fillText(info.lugar, W / 2, y += s1);
-      var s2 = Math.round(W * 0.035);
+      var s2 = Math.round(W * 0.048);
       ctx.font = s2 + 'px sans-serif';
       ctx.fillText(info.ciudad || '', W / 2, y += s2 * 1.5);
       ctx.font = 'bold ' + s2 + 'px sans-serif';
       ctx.fillText(info.dia + ' ' + info.mes + ' ' + info.anio, W / 2, y += s2 * 1.5);
-      var s3 = Math.round(W * 0.028);
-      ctx.font = s3 + 'px sans-serif';
+      if (info.transporte) {
+        var s3 = Math.round(W * 0.036);
+        ctx.font = s3 + 'px sans-serif';
+        ctx.fillStyle = '#bbb';
+        ctx.fillText('🚌 ' + info.transporte, W / 2, y += s2 * 1.4);
+      }
+      if (mapaUrl) {
+        var s4 = Math.round(W * 0.032);
+        ctx.font = s4 + 'px sans-serif';
+        ctx.fillStyle = '#9cf';
+        ctx.fillText('🗺️ ' + mapaUrl, W / 2, y += s2 * 1.3);
+      }
       ctx.fillStyle = '#ccc';
-      ctx.fillText('🎫 Entradas / Info: wa.me/' + WHATSAPP_CANTANTE, W / 2, y += s2 * 1.8);
+      var s5 = Math.round(W * 0.032);
+      ctx.font = s5 + 'px sans-serif';
+      ctx.fillText('🎫 Entradas / Info: wa.me/' + WHATSAPP_CANTANTE, W / 2, y += s2 * 1.4);
       canvas.toBlob(function (blob) {
         if (!blob) { reject(new Error('toBlob failed')); return; }
         resolve(new File([blob], 'flyer-' + info.dia + info.mes + '.jpg', { type: 'image/jpeg' }));
@@ -230,29 +242,25 @@ function shareFecha(e, idx) {
   if (!f) return;
   var imgUrl = (f.fotos && f.fotos.length) ? f.fotos[0] : '';
   var mapaLink = f.mapa ? f.mapa.replace(/&output=embed/, '').replace(/output=embed&?/, '') : '';
-  var waUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(
-    '🎵 *' + f.lugar + '*\n📍 ' + (f.ciudad || '') + '\n📅 ' + f.dia + '/' + f.mes + '/' + f.anio +
+  var msgText = '🎵 *' + f.lugar + '*\n📍 ' + (f.ciudad || '') + '\n📅 ' + f.dia + '/' + f.mes + '/' + f.anio +
     (f.descripcion ? '\n📝 ' + f.descripcion : '') +
     (f.transporte ? '\n🚌 ' + f.transporte : '') +
     (mapaLink ? '\n🗺️ Ver ubicación: ' + mapaLink : '') +
-    '\n\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE
-  );
+    '\n\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE;
+  var waUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(msgText);
 
   if (!imgUrl) {
     location.href = waUrl;
-    if (mapaLink) setTimeout(function () { window.open(mapaLink, '_blank'); }, 500);
     return;
   }
 
-  var info = { lugar: f.lugar, ciudad: f.ciudad, dia: f.dia, mes: f.mes, anio: f.anio };
+  var info = { lugar: f.lugar, ciudad: f.ciudad, dia: f.dia, mes: f.mes, anio: f.anio, transporte: f.transporte || '' };
 
-  generarFlyer(imgUrl, info).then(function (file) {
+  generarFlyer(imgUrl, info, mapaLink).then(function (file) {
     if (navigator.share && navigator.canShare) {
-      var data = { files: [file] };
+      var data = { files: [file], text: msgText };
       if (navigator.canShare(data)) {
-        return navigator.share(data).then(function () {
-          if (mapaLink) setTimeout(function () { location.href = mapaLink; }, 400);
-        });
+        return navigator.share(data).then(function () {}).catch(function () {});
       }
     }
     var a = document.createElement('a');
@@ -263,10 +271,8 @@ function shareFecha(e, idx) {
     document.body.removeChild(a);
     URL.revokeObjectURL(a.href);
     location.href = waUrl;
-    if (mapaLink) setTimeout(function () { window.open(mapaLink, '_blank'); }, 500);
   }).catch(function () {
     location.href = waUrl;
-    if (mapaLink) setTimeout(function () { window.open(mapaLink, '_blank'); }, 500);
   });
 }
 
