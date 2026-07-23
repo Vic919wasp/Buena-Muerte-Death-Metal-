@@ -37,7 +37,7 @@ var FECHAS = [
     fotos: ['assets/posts/post-01.jpg']
   },
   {
-    dia: '22',
+    dia: '24',
     mes: 'JUL',
     anio: '2026',
     lugar: 'GIER MUSIC CLUB',
