@@ -37,8 +37,8 @@ var FECHAS = [
     fotos: ['assets/tour/Fecha Brutal death en Gier.jpeg']
   },
   {
-    dia: '22',
-    mes: 'JUL',
+    dia: '27',
+    mes: 'OCT',
     anio: '2026',
     lugar: 'EL TEATRITO',
     ciudad: 'CABA',

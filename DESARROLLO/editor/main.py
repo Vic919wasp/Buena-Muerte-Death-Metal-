@@ -24,6 +24,7 @@ from tabs.videos_tab import VideosTab
 from tabs.contact_tab import ContactTab
 from tabs.newsletter_tab import NewsletterTab
 from tabs.settings_tab import SettingsTab
+from tabs.ai_tab import AITab
 
 
 # [002] VENTANA PRINCIPAL
@@ -53,6 +54,7 @@ class MainWindow(QMainWindow):
         tabs.addTab(BandTab(), "Banda")
         tabs.addTab(ContactTab(), "Contacto")
         tabs.addTab(NewsletterTab(), "Newsletter")
+        tabs.addTab(AITab(), "AI")
         tabs.addTab(SettingsTab(), "Publicar")
         layout.addWidget(tabs)
 

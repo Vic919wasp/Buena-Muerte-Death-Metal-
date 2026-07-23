@@ -47,13 +47,15 @@ class TourTab(QWidget):
         row1 = QHBoxLayout()
         self.date_input = QDateEdit()
         self.date_input.setCalendarPopup(True)
-        self.date_input.setDate(QDate.currentDate())
+        self.date_input.setDate(QDate(2026, 1, 1))
         self.date_input.setDisplayFormat("dd/MM/yyyy")
+        self.date_input.setStyleSheet("color:#9aa0a6;")
+        self.date_input.setToolTip("Fecha en que se realiza el show (NO es la fecha de hoy)")
         self.place_input = QLineEdit()
         self.place_input.setPlaceholderText("Lugar *")
         self.city_input = QLineEdit()
         self.city_input.setPlaceholderText("Ciudad")
-        row1.addWidget(QLabel("Fecha:"))
+        row1.addWidget(QLabel("Fecha del show:"))
         row1.addWidget(self.date_input)
         row1.addWidget(self.place_input)
         row1.addWidget(self.city_input)
@@ -170,6 +172,15 @@ class TourTab(QWidget):
         row = index.row()
         if row < len(self.fechas):
             f = self.fechas[row]
+            try:
+                dia = int(f.get("dia", "1"))
+                mes_map = {"ENE": 1, "FEB": 2, "MAR": 3, "ABR": 4, "MAY": 5, "JUN": 6,
+                           "JUL": 7, "AGO": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DIC": 12}
+                mes = mes_map.get(f.get("mes", "ENE"), 1)
+                anio = int(f.get("anio", "2026"))
+                self.date_input.setDate(QDate(anio, mes, dia))
+            except (ValueError, TypeError):
+                self.date_input.setDate(QDate(2026, 1, 1))
             self.place_input.setText(f.get("lugar", ""))
             self.city_input.setText(f.get("ciudad", ""))
             self.tickets_input.setText(f.get("link", ""))
@@ -216,6 +227,7 @@ class TourTab(QWidget):
         QMessageBox.information(self, "Guardado", "Fechas guardadas correctamente.")
 
     def _clear_form(self):
+        self.date_input.setDate(QDate(2026, 1, 1))
         self.place_input.clear()
         self.city_input.clear()
         self.tickets_input.clear()
