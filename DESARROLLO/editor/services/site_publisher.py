@@ -15,9 +15,11 @@ SITE_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")
 
 def _run(cmd, cwd=SITE_ROOT):
     result = subprocess.run(
-        cmd, shell=True, cwd=cwd, capture_output=True, text=True, timeout=30
+        cmd, shell=True, cwd=cwd, capture_output=True, timeout=30
     )
-    return result.returncode == 0, (result.stdout or "").strip(), (result.stderr or "").strip()
+    out = result.stdout.decode("utf-8", errors="replace").strip() if result.stdout else ""
+    err = result.stderr.decode("utf-8", errors="replace").strip() if result.stderr else ""
+    return result.returncode == 0, out, err
 
 
 # [002] PUBLICAR
