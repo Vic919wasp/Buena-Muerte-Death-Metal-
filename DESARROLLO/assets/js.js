@@ -135,7 +135,7 @@ function renderFechas() {
   empty.style.display = 'none';
   container.style.display = 'block';
   if (head) { head.textContent = FECHAS.length + ' fecha' + (FECHAS.length === 1 ? '' : 's') + ' confirmada' + (FECHAS.length === 1 ? '' : 's'); }
-  container.innerHTML = FECHAS.map(function (f) {
+  container.innerHTML = FECHAS.map(function (f, i) {
     var cta = '';
     if (f.link && f.link !== '#') {
       cta = '<a href="' + f.link + '" target="_blank" rel="noopener" class="tour-card__btn">ENTRADAS ›</a>';
@@ -169,11 +169,7 @@ function renderFechas() {
       (f.mapa ? '\n🗺️ Ver ubicación: ' + mapaLink + '\n' : '') +
       '\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE;
     var shareUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(shareText);
-    var shareId = 'share_' + f.dia + '_' + (f.mes || '').replace(/\W/g, '');
-    var share = '<a href="#" class="tour-card__btn tour-card__btn--wa" onclick="shareFecha(event, \'' + shareId + '\')">COMPARTIR FECHA ›</a>' +
-      '<input type="hidden" id="' + shareId + '_url" value="' + (f.fotos && f.fotos.length ? f.fotos[0] : '') + '">' +
-      '<input type="hidden" id="' + shareId + '_wa" value="' + shareUrl + '">' +
-      '<input type="hidden" id="' + shareId + '_mapa" value="' + (mapaLink || '') + '">';
+    var share = '<a href="#" class="tour-card__btn tour-card__btn--wa" onclick="shareFecha(event, ' + i + ')">COMPARTIR FECHA ›</a>';
     return '<div class="tour-card">' +
       '<div class="tour-card__fecha"><b>' + f.dia + '</b><br><span>' + (f.mes || '') + ' ' + (f.anio || '') + '</span></div>' +
       '<div class="tour-card__info">' +
@@ -228,33 +224,34 @@ function generarFlyer(imageUrl, info) {
 }
 
 /* Compartir fecha: flyer compuesto + mapa */
-function shareFecha(e, id) {
+function shareFecha(e, idx) {
   e.preventDefault();
-  var imgUrl = document.getElementById(id + '_url').value;
-  var waUrl = document.getElementById(id + '_wa').value;
-  var mapaUrl = document.getElementById(id + '_mapa').value;
+  var f = FECHAS[idx];
+  if (!f) return;
+  var imgUrl = (f.fotos && f.fotos.length) ? f.fotos[0] : '';
+  var mapaLink = f.mapa ? f.mapa.replace(/&output=embed/, '').replace(/output=embed&?/, '') : '';
+  var waUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(
+    '🎵 *' + f.lugar + '*\n📍 ' + (f.ciudad || '') + '\n📅 ' + f.dia + '/' + f.mes + '/' + f.anio +
+    (f.descripcion ? '\n📝 ' + f.descripcion : '') +
+    (f.transporte ? '\n🚌 ' + f.transporte : '') +
+    (mapaLink ? '\n🗺️ Ver ubicación: ' + mapaLink : '') +
+    '\n\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE
+  );
 
   if (!imgUrl) {
     location.href = waUrl;
-    if (mapaUrl) setTimeout(function () { window.open(mapaUrl, '_blank'); }, 500);
+    if (mapaLink) setTimeout(function () { window.open(mapaLink, '_blank'); }, 500);
     return;
   }
 
-  generarFlyer(imgUrl, { lugar: '', ciudad: '', dia: '', mes: '', anio: '' }).then(function () { return; }).catch(function () { return; });
-
-  var idx = -1;
-  for (var i = 0; i < FECHAS.length; i++) {
-    if (imgUrl.indexOf(FECHAS[i].fotos && FECHAS[i].fotos[0] ? FECHAS[i].fotos[0] : '') > -1 && FECHAS[i].fotos) { idx = i; break; }
-  }
-  var f = idx >= 0 ? FECHAS[idx] : null;
-  var info = f ? { lugar: f.lugar, ciudad: f.ciudad, dia: f.dia, mes: f.mes, anio: f.anio } : { lugar: '', ciudad: '', dia: '', mes: '', anio: '' };
+  var info = { lugar: f.lugar, ciudad: f.ciudad, dia: f.dia, mes: f.mes, anio: f.anio };
 
   generarFlyer(imgUrl, info).then(function (file) {
     if (navigator.share && navigator.canShare) {
       var data = { files: [file] };
       if (navigator.canShare(data)) {
         return navigator.share(data).then(function () {
-          if (mapaUrl) setTimeout(function () { location.href = mapaUrl; }, 400);
+          if (mapaLink) setTimeout(function () { location.href = mapaLink; }, 400);
         });
       }
     }
@@ -266,10 +263,10 @@ function shareFecha(e, id) {
     document.body.removeChild(a);
     URL.revokeObjectURL(a.href);
     location.href = waUrl;
-    if (mapaUrl) setTimeout(function () { window.open(mapaUrl, '_blank'); }, 500);
+    if (mapaLink) setTimeout(function () { window.open(mapaLink, '_blank'); }, 500);
   }).catch(function () {
     location.href = waUrl;
-    if (mapaUrl) setTimeout(function () { window.open(mapaUrl, '_blank'); }, 500);
+    if (mapaLink) setTimeout(function () { window.open(mapaLink, '_blank'); }, 500);
   });
 }
 
