@@ -1,17 +1,19 @@
 """
 CONTEXTO: Tab de asistente AI — chat, acciones rápidas editables,
-          scraper de escena ARG, análisis de código.
+          scraper de escena ARG, análisis de código, historial de tokens.
 ÍNDICE DE NAVEGACIÓN
 [001] IMPORTS / CLASE        - línea 12
-[002] DEFAULT ACTIONS        - línea 30
-[003] UI / LAYOUT            - línea 42
-[004] ACCIONES AI            - línea 155
-[005] CHAT                   - línea 240
-[006] ACCIONES RÁPIDAS EDIT  - línea 290
-[007] HELPERS                - línea 340
+[002] DEFAULT ACTIONS        - línea 32
+[003] UI / LAYOUT            - línea 44
+[004] ACCIONES AI            - línea 160
+[005] CHAT                   - línea 245
+[006] ACCIONES RÁPIDAS EDIT  - línea 295
+[007] TOKEN HISTORY          - línea 360
+[008] HELPERS                - línea 420
 """
 import json
 import os
+from datetime import datetime, timedelta
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
     QTextEdit, QLineEdit, QFrame, QSplitter, QMessageBox,
@@ -32,6 +34,7 @@ from services.prompt_builder import (
 )
 
 ACTIONS_FILE = os.path.join(os.path.dirname(__file__), "..", "quick_actions.json")
+USAGE_FILE = os.path.join(os.path.dirname(__file__), "..", "token_usage.json")
 
 DEFAULT_ACTIONS = [
     {"label": "Actualizar escena ARG", "prompt": "", "action": "scrape"},
@@ -72,6 +75,7 @@ class AITab(QWidget):
         self._action_btns = []
         self._setup_ui()
         self._check_ollama()
+        self._refresh_usage_stats()
 
     def _setup_ui(self):
         layout = QVBoxLayout(self)
@@ -125,6 +129,23 @@ class AITab(QWidget):
         self.scene_text.setPlaceholderText("Clic en 'Actualizar escena ARG'...")
         self.scene_text.setMaximumHeight(120)
         left_l.addWidget(self.scene_text)
+
+        usage_header = QLabel("Uso de tokens")
+        usage_header.setStyleSheet("color:#7a6346; font-family:'Cinzel',serif; margin-top:8px;")
+        left_l.addWidget(usage_header)
+
+        self.usage_day = QLabel("Hoy: 0 tokens")
+        self.usage_day.setStyleSheet("color:#9aa0a6; font-size:11px;")
+        left_l.addWidget(self.usage_day)
+        self.usage_week = QLabel("Semana: 0 tokens")
+        self.usage_week.setStyleSheet("color:#9aa0a6; font-size:11px;")
+        left_l.addWidget(self.usage_week)
+        self.usage_month = QLabel("Mes: 0 tokens")
+        self.usage_month.setStyleSheet("color:#9aa0a6; font-size:11px;")
+        left_l.addWidget(self.usage_month)
+        self.usage_total = QLabel("Total: 0 tokens")
+        self.usage_total.setStyleSheet("color:#7a6346; font-size:11px; font-weight:bold;")
+        left_l.addWidget(self.usage_total)
 
         left_l.addStretch()
 
@@ -284,6 +305,9 @@ class AITab(QWidget):
         self.send_btn.setEnabled(True)
         self.chat_output.append(f"AI:\n{text}\n\n")
         self.chat_history.append({"role": "assistant", "content": text})
+        tokens_in = self._estimate_tokens([{"role": "user", "content": self.chat_input.text()}])
+        tokens_out = len(text) // 3 + 5
+        self._record_tokens(tokens_in, tokens_out)
 
     def _on_ai_error(self, error):
         self.progress.setVisible(False)
@@ -388,6 +412,70 @@ class AITab(QWidget):
             self._run_custom_action(item.text())
 
     # [007] HELPERS
+    def _estimate_tokens(self, messages):
+        total = 0
+        for m in messages:
+            c = m.get("content", "")
+            total += len(c) // 3 + 5
+        return total
+
+    def _update_token_count(self):
+        text = self.chat_input.text()
+        est = len(text) // 3 + 5
+        if est > 400:
+            self.token_label.setStyleSheet("color:#ff4444; font-size:10px; min-width:40px;")
+        elif est > 250:
+            self.token_label.setStyleSheet("color:#cc8800; font-size:10px; min-width:40px;")
+        else:
+            self.token_label.setStyleSheet("color:#7a6346; font-size:10px; min-width:40px;")
+        self.token_label.setText(str(est))
+
+    # [007] TOKEN HISTORY
+    def _load_usage(self):
+        if os.path.exists(USAGE_FILE):
+            try:
+                with open(USAGE_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return []
+
+    def _save_usage(self, entry):
+        usage = self._load_usage()
+        usage.append(entry)
+        with open(USAGE_FILE, "w", encoding="utf-8") as f:
+            json.dump(usage, f, ensure_ascii=False, indent=2)
+
+    def _record_tokens(self, tokens_in, tokens_out):
+        now = datetime.now()
+        self._save_usage({
+            "ts": now.isoformat(),
+            "in": tokens_in,
+            "out": tokens_out,
+        })
+        self._refresh_usage_stats()
+
+    def _refresh_usage_stats(self):
+        usage = self._load_usage()
+        now = datetime.now()
+        day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        week_start = day_start - timedelta(days=now.weekday())
+        month_start = day_start.replace(day=1)
+
+        total_day = sum(e.get("in", 0) + e.get("out", 0) for e in usage
+                        if datetime.fromisoformat(e["ts"]) >= day_start)
+        total_week = sum(e.get("in", 0) + e.get("out", 0) for e in usage
+                         if datetime.fromisoformat(e["ts"]) >= week_start)
+        total_month = sum(e.get("in", 0) + e.get("out", 0) for e in usage
+                          if datetime.fromisoformat(e["ts"]) >= month_start)
+        total_all = sum(e.get("in", 0) + e.get("out", 0) for e in usage)
+
+        self.usage_day.setText(f"Hoy: {total_day:,} tokens")
+        self.usage_week.setText(f"Semana: {total_week:,} tokens")
+        self.usage_month.setText(f"Mes: {total_month:,} tokens")
+        self.usage_total.setText(f"Total: {total_all:,} tokens")
+
+    # [008] HELPERS
     def _estimate_tokens(self, messages):
         total = 0
         for m in messages:
