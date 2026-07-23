@@ -16,8 +16,8 @@ from typing import Optional, Generator
 
 # [001] CONFIG / CONSTANTES
 OLLAMA_BASE_URL = "http://localhost:11434"
-OLLAMA_MODEL = "llama3.2:3b"
-TIMEOUT_SECONDS = 60
+OLLAMA_MODEL = "qwen2.5:1.5b"
+TIMEOUT_SECONDS = 45
 
 
 # [002] CLIENTE OLLAMA
@@ -64,7 +64,7 @@ def chat(messages: list, model: str = OLLAMA_MODEL,
         "model": model,
         "messages": messages,
         "stream": stream,
-        "options": {"temperature": temperature, "num_predict": 512},
+        "options": {"temperature": temperature, "num_predict": 300},
     }
     try:
         r = requests.post(
@@ -90,7 +90,7 @@ def chat_stream(messages: list, model: str = OLLAMA_MODEL,
         "model": model,
         "messages": messages,
         "stream": True,
-        "options": {"temperature": temperature, "num_predict": 512},
+        "options": {"temperature": temperature, "num_predict": 300},
     }
     try:
         r = requests.post(

@@ -195,7 +195,7 @@ class AITab(QWidget):
     # [004] ACCIONES AI
     def _check_ollama(self):
         if ai_service.OllamaClient().is_available():
-            self.status_label.setText("Ollama conectado (llama3.2:3b)")
+            self.status_label.setText("Ollama conectado (qwen2.5:1.5b)")
             self.status_label.setStyleSheet("color:#4a9; font-size:11px;")
         else:
             self.status_label.setText("Ollama no detectado. Inicia Ollama para usar el asistente.")
@@ -284,15 +284,9 @@ class AITab(QWidget):
         self.chat_history.append({"role": "user", "content": text})
         ctx = (scraper.get_scene_summary() if self.scene_data else "")[:300]
         system = (
-            "Sos el asistente de Buena Muerte, banda de death metal de "
-            "Zona Sur, AMBA, Argentina. Formada en 2013. "
+            "Sos el asistente de Buena Muerte, death metal, Zona Sur, AMBA. "
             "Cantante: Favio Leguizamón. Sello: Macabre Records. "
-            "Redes: instagram.com/buena.muerte, youtube.com/results?search_query=buena+muerte+death+metal, "
-            "spotify.com/artist/5q9MTB7bYNx20VzAsYTblL. "
-            "WhatsApp entradas: 5491164377706. "
-            "Sitio: buena-muerte-death-metal.onrender.com. "
-            "Respondé en español, sé conciso y directo. "
-            "Si te piden biografías, datos de la banda o integrantes, usá esta info."
+            "WhatsApp: 5491164377706. Sé conciso y directo."
         )
         if ctx:
             system += f" Escena ARG reciente: {ctx}"
