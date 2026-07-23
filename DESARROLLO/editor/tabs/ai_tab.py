@@ -177,6 +177,10 @@ class AITab(QWidget):
         self.send_btn = QPushButton("Enviar")
         self.send_btn.clicked.connect(self._send_chat)
         chat_row.addWidget(self.send_btn)
+        clear_btn = QPushButton("Limpiar")
+        clear_btn.setToolTip("Limpiar historial de chat")
+        clear_btn.clicked.connect(self._clear_chat)
+        chat_row.addWidget(clear_btn)
         right_l.addLayout(chat_row)
 
         main_split.addWidget(right_panel)
@@ -273,13 +277,25 @@ class AITab(QWidget):
         if not text:
             return
         text = text[:500]
+        import re
+        text = re.sub(r'https?://\S+', '[enlace omitido]', text)
         self.chat_input.clear()
         self.chat_output.append(f"Tu: {text}\n")
         self.chat_history.append({"role": "user", "content": text})
         ctx = (scraper.get_scene_summary() if self.scene_data else "")[:300]
-        system = "Sos asistente de Buena Muerte (death metal, Zona Sur, AMBA). Sé conciso."
+        system = (
+            "Sos el asistente de Buena Muerte, banda de death metal de "
+            "Zona Sur, AMBA, Argentina. Formada en 2013. "
+            "Cantante: Favio Leguizamón. Sello: Macabre Records. "
+            "Redes: instagram.com/buena.muerte, youtube.com/results?search_query=buena+muerte+death+metal, "
+            "spotify.com/artist/5q9MTB7bYNx20VzAsYTblL. "
+            "WhatsApp entradas: 5491164377706. "
+            "Sitio: buena-muerte-death-metal.onrender.com. "
+            "Respondé en español, sé conciso y directo. "
+            "Si te piden biografías, datos de la banda o integrantes, usá esta info."
+        )
         if ctx:
-            system += f" Escena ARG: {ctx}"
+            system += f" Escena ARG reciente: {ctx}"
         messages = [{"role": "system", "content": system}] + self.chat_history[-5:]
         total_tokens = self._estimate_tokens(messages)
         self.token_label.setText(str(total_tokens))
@@ -313,6 +329,12 @@ class AITab(QWidget):
         self.progress.setVisible(False)
         self.send_btn.setEnabled(True)
         self.chat_output.append(f"[Error: {error}]\n\n")
+
+    def _clear_chat(self):
+        self.chat_history.clear()
+        self.chat_output.clear()
+        self.token_label.setText("0")
+        self.token_label.setStyleSheet("color:#7a6346; font-size:10px; min-width:40px;")
 
     # [006] ACCIONES RÁPIDAS EDIT
     def _load_actions(self):
