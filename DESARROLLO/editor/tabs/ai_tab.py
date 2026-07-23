@@ -279,12 +279,18 @@ class AITab(QWidget):
         text = text[:500]
         import re
         urls = re.findall(r'https?://\S+', text)
+        if not urls:
+            urls = re.findall(r'[\w.-]+\.(?:com|org|net|ar|onrender)\S*', text)
         web_context = ""
         if urls:
             for url in urls[:2]:
+                if not url.startswith("http"):
+                    url = "https://" + url
                 self.chat_output.append(f"[Scrapeando {url}...]\n")
                 web_context += ai_service.scrape_url(url) + "\n"
-            text = re.sub(r'https?://\S+', '', text).strip()
+            text = re.sub(r'https?://\S+', '', text)
+            text = re.sub(r'[\w.-]+\.(?:com|org|net|ar|onrender)\S*', '', text)
+            text = text.strip()
             if not text:
                 text = "Armame una bio completa basada en la info scrapeada."
         self.chat_input.clear()
