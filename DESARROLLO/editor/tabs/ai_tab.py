@@ -300,8 +300,23 @@ class AITab(QWidget):
             if not text:
                 text = "Analizá la info scrapeada y respondé."
 
+        member_keywords = [
+            "baterista", "batero", "guitarrista", "guitarrista", "bajista",
+            "integrante", "miembro", "cantante", "vocalista", "tecladista",
+            "fabi", "leguizamón", "leguizamon",
+        ]
+        is_member_query = any(k in text.lower() for k in member_keywords)
         web_keywords = ["web", "sitio", "página", "pagina", "buscar", "escrapea", "scrapear", "busca"]
         is_web_request = any(k in text.lower() for k in web_keywords)
+
+        if is_member_query and not web_context:
+            self.chat_output.append(f"[Buscando info del integrante en la web...]\n")
+            from services.content_scraper import fetch_band_info
+            band_data = fetch_band_info("Buena Muerte")
+            web_context = band_data.get("text", "")[:4000]
+            if band_data.get("images"):
+                web_context += f"\nImágenes encontradas: {len(band_data['images'])}"
+
         if is_web_request and not web_context:
             site_url = "https://buena-muerte-death-metal.onrender.com"
             self.chat_output.append(f"[Scrapeando {site_url}...]\n")
@@ -318,8 +333,8 @@ class AITab(QWidget):
             "Sos el asistente de Buena Muerte, death metal, Zona Sur, AMBA. "
             "Cantante: Favio Leguizamón. Sello: Macabre Records. "
             "WhatsApp: 5491164377706. "
-            "REGLA IMPORTANTE: Si tenés info scrapeada de la web, usala como "
-            "fuente principal. NO inventes datos que no estén en la info scrapeada. "
+            "Si tenés info scrapeada de la web, usala como fuente principal. "
+            "NO inventes datos que no estén en la info scrapeada. "
             "Si no tenés info scrapeada, aclará que no encontraste datos."
         )
         if ctx:
