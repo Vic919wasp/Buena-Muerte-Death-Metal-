@@ -569,6 +569,17 @@ body::before {
   transition: color .2s;
 }
 .tour-card__mapa-link:hover { color: var(--hueso); }
+.tour-card__desc {
+  font-family: var(--fuente-serif);
+  font-size: .85rem;
+  font-style: italic;
+  color: var(--hueso);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  padding: .8rem 1rem;
+  border-left: 2px solid var(--rojo-vivo);
+  background: rgba(74,15,13,.1);
+}
 .tour-card__transporte {
   font-family: var(--fuente-sans);
   font-size: .7rem;

@@ -165,18 +165,22 @@ function renderFechas() {
     }
     var shareText = '🎵 *' + f.lugar + '*\n' +
       '📍 ' + (f.ciudad || '') + '\n' +
-      '📅 ' + f.dia + '/' + f.mes + '/' + f.anio + '\n' +
-      (f.descripcion ? '\n📝 ' + f.descripcion + '\n' : '') +
+      f.dia + ' ' + f.mes + ' ' + f.anio + '\n' +
+      (f.descripcion ? '\n' + f.descripcion + '\n' : '') +
       (f.transporte ? '\n🚌 ' + f.transporte + '\n' : '') +
       (f.mapa ? '\n🗺️ Ver ubicación: ' + mapaLink + '\n' : '') +
       '\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE + REDES_FOOTER;
     var shareUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(shareText);
     var share = '<a href="#" class="tour-card__btn tour-card__btn--wa" onclick="shareFecha(event, ' + i + ')">COMPARTIR FECHA ›</a>';
+    var desc = '';
+    if (f.descripcion) {
+      desc = '<div class="tour-card__desc">' + f.descripcion + '</div>';
+    }
     return '<div class="tour-card">' +
       '<div class="tour-card__fecha"><b>' + f.dia + '</b><br><span>' + (f.mes || '') + ' ' + (f.anio || '') + '</span></div>' +
       '<div class="tour-card__info">' +
         '<div class="tour-card__lugar">' + f.lugar + '<span>' + (f.ciudad || '') + '</span></div>' +
-        cta + share + fotos + mapa + transporte +
+        desc + cta + share + fotos + mapa + transporte +
       '</div>' +
     '</div>';
   }).join('');
@@ -248,8 +252,8 @@ function shareFecha(e, idx) {
   if (!f) return;
   var imgUrl = (f.fotos && f.fotos.length) ? f.fotos[0] : '';
   var mapaLink = f.mapa ? f.mapa.replace(/&output=embed/, '').replace(/output=embed&?/, '') : '';
-  var msgText = '🎵 *' + f.lugar + '*\n📍 ' + (f.ciudad || '') + '\n📅 ' + f.dia + '/' + f.mes + '/' + f.anio +
-    (f.descripcion ? '\n📝 ' + f.descripcion : '') +
+  var msgText = '🎵 *' + f.lugar + '*\n📍 ' + (f.ciudad || '') + '\n' + f.dia + ' ' + f.mes + ' ' + f.anio +
+    (f.descripcion ? '\n' + f.descripcion : '') +
     (f.transporte ? '\n🚌 ' + f.transporte : '') +
     (mapaLink ? '\n🗺️ Ver ubicación: ' + mapaLink : '') +
     '\n\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE + REDES_FOOTER;
