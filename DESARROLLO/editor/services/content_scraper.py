@@ -49,6 +49,81 @@ SOURCES = {
         "url": "https://www.metaldaze.com.ar",
         "type": "news",
     },
+    "revistaimpuridad": {
+        "name": "Revista Impuridad",
+        "url": "https://www.revistaimpuridad.com",
+        "type": "news",
+    },
+    "elgigantedelaplata": {
+        "name": "El Gigante de la Plata",
+        "url": "https://elgigantedelaplata.com",
+        "type": "news",
+    },
+    "claseb": {
+        "name": "Clase B Rock y Metal",
+        "url": "https://claseb.net",
+        "type": "news",
+    },
+    "rockaxes": {
+        "name": "Rockaxes",
+        "url": "https://www.rockaxes.com",
+        "type": "news",
+    },
+    "bravewords": {
+        "name": "Brave Words",
+        "url": "https://bravewords.com",
+        "type": "international",
+    },
+    "metalinjection": {
+        "name": "Metal Injection",
+        "url": "https://www.metalinjection.net",
+        "type": "international",
+    },
+    "metalsucks": {
+        "name": "MetalSucks",
+        "url": "https://metalsucks.net",
+        "type": "international",
+    },
+    "decibelmagazine": {
+        "name": "Decibel Magazine",
+        "url": "https://www.decibelmagazine.com",
+        "type": "international",
+    },
+    "blabbermouth": {
+        "name": "Blabbermouth",
+        "url": "https://www.blabbermouth.net",
+        "type": "international",
+    },
+    "loudwire": {
+        "name": "Loudwire",
+        "url": "https://loudwire.com",
+        "type": "international",
+    },
+    "metalkaoz": {
+        "name": "Metal Kaoz",
+        "url": "https://www.metalkaoz.com",
+        "type": "international",
+    },
+    "spiritofmetal": {
+        "name": "Spirit of Metal",
+        "url": "https://www.spirit-of-metal.com",
+        "type": "international",
+    },
+    "metalarch": {
+        "name": "Metal Archives",
+        "url": "https://www.metal-archives.com",
+        "type": "database",
+    },
+    "setlistfm": {
+        "name": "Setlist.fm",
+        "url": "https://www.setlist.fm",
+        "type": "database",
+    },
+    "spotify": {
+        "name": "Spotify",
+        "url": "https://open.spotify.com",
+        "type": "streaming",
+    },
 }
 
 
@@ -122,7 +197,7 @@ def search_web(query: str, num_results: int = 5) -> list:
 def fetch_article(url: str) -> dict:
     """Trae un artículo completo de una URL, extrae texto, imagen y título."""
     data = scrape_url(url, max_chars=6000)
-    if not data["ok"]:
+    if not data.get("ok"):
         return data
 
     text = data["text"]
@@ -138,6 +213,50 @@ def fetch_article(url: str) -> dict:
         "body": body[:2000],
         "images": data["images"],
         "ok": True,
+    }
+
+
+def fetch_band_info(band_name: str = "Buena Muerte") -> dict:
+    """Busca info de la banda en múltiples fuentes y consolida."""
+    results = {"texts": [], "images": [], "sources": []}
+
+    site_url = "https://buena-muerte-death-metal.onrender.com"
+    site = scrape_url(site_url, max_chars=3000)
+    if site.get("ok"):
+        results["texts"].append(f"[Sitio oficial]\n{site['text']}")
+        results["images"].extend(site.get("images", []))
+        results["sources"].append(site_url)
+
+    queries = [
+        f"{band_name} death metal argentina bio integrantes",
+        f"{band_name} Favio Leguizamón cantante vocalista",
+        f"{band_name} Catalepsia disco review",
+        f"{band_name} Dios Es Sádico EP",
+        f"{band_name} shows 2024 2025 2026 Argentina",
+        f"{band_name} Macabre Records",
+    ]
+    for q in queries:
+        search_results = search_web(q, num_results=5)
+        for r in search_results[:3]:
+            url = r["url"]
+            if any(skip in url for skip in ["youtube.com", "facebook.com", "twitter.com", "x.com", "tiktok.com"]):
+                continue
+            if url in results["sources"]:
+                continue
+            article = scrape_url(url, max_chars=2000)
+            if article.get("ok") and article.get("text"):
+                txt = article["text"]
+                if len(txt) > 100:
+                    results["texts"].append(f"[{r['title']}]\n{txt[:1500]}")
+                    results["images"].extend(article.get("images", [])[:2])
+                    results["sources"].append(url)
+
+    consolidated = "\n\n---\n\n".join(results["texts"])
+    return {
+        "text": consolidated[:8000],
+        "images": results["images"][:8],
+        "sources": results["sources"],
+        "ok": bool(results["texts"]),
     }
 
 
