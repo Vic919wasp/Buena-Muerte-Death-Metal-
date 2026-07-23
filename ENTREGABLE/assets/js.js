@@ -170,10 +170,10 @@ function renderFechas() {
       '\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE;
     var shareUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(shareText);
     var shareId = 'share_' + f.dia + '_' + (f.mes || '').replace(/\W/g, '');
-    var share = '<button class="tour-card__btn tour-card__btn--share" onclick="shareFecha(\'' + shareId + '\')">COMPARTIR FECHA ›</button>' +
-      '<input type="hidden" id="' + shareId + '_url" value="' + (f.fotos && f.fotos.length ? location.origin + '/' + f.fotos[0] : '') + '">' +
-      '<input type="hidden" id="' + shareId + '_text" value="' + encodeURIComponent(shareText) + '">' +
-      '<input type="hidden" id="' + shareId + '_wa" value="' + shareUrl + '">';
+    var share = '<a href="#" class="tour-card__btn tour-card__btn--wa" onclick="shareFecha(event, \'' + shareId + '\')">COMPARTIR FECHA ›</a>' +
+      '<input type="hidden" id="' + shareId + '_url" value="' + (f.fotos && f.fotos.length ? f.fotos[0] : '') + '">' +
+      '<input type="hidden" id="' + shareId + '_wa" value="' + shareUrl + '">' +
+      '<input type="hidden" id="' + shareId + '_mapa" value="' + (mapaLink || '') + '">';
     return '<div class="tour-card">' +
       '<div class="tour-card__fecha"><b>' + f.dia + '</b><br><span>' + (f.mes || '') + ' ' + (f.anio || '') + '</span></div>' +
       '<div class="tour-card__info">' +
@@ -184,29 +184,93 @@ function renderFechas() {
   }).join('');
 }
 
-/* Compartir fecha: imagen primero (Web Share API), luego WhatsApp */
-function shareFecha(id) {
+/* Generar flyer compuesto: foto + barra de texto al pie */
+function generarFlyer(imageUrl, info) {
+  var W = 1080, H = Math.round(W * 1.35);
+  var BAR_H = Math.round(H * 0.25);
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+  return new Promise(function (resolve, reject) {
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function () {
+      var imgR = img.width / img.height, canR = W / H;
+      var sx, sy, sw, sh;
+      if (imgR > canR) { sh = img.height; sw = sh * canR; sx = (img.width - sw) / 2; sy = 0; }
+      else { sw = img.width; sh = sw / canR; sx = 0; sy = (img.height - sh) / 2; }
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
+      ctx.fillStyle = 'rgba(0,0,0,0.7)';
+      ctx.fillRect(0, H - BAR_H, W, BAR_H);
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      var y = H - BAR_H + Math.round(H * 0.04);
+      var s1 = Math.round(W * 0.05);
+      ctx.font = 'bold ' + s1 + 'px sans-serif';
+      ctx.fillText(info.lugar, W / 2, y += s1);
+      var s2 = Math.round(W * 0.035);
+      ctx.font = s2 + 'px sans-serif';
+      ctx.fillText(info.ciudad || '', W / 2, y += s2 * 1.5);
+      ctx.font = 'bold ' + s2 + 'px sans-serif';
+      ctx.fillText(info.dia + ' ' + info.mes + ' ' + info.anio, W / 2, y += s2 * 1.5);
+      var s3 = Math.round(W * 0.028);
+      ctx.font = s3 + 'px sans-serif';
+      ctx.fillStyle = '#ccc';
+      ctx.fillText('🎫 Entradas / Info: wa.me/' + WHATSAPP_CANTANTE, W / 2, y += s2 * 1.8);
+      canvas.toBlob(function (blob) {
+        if (!blob) { reject(new Error('toBlob failed')); return; }
+        resolve(new File([blob], 'flyer-' + info.dia + info.mes + '.jpg', { type: 'image/jpeg' }));
+      }, 'image/jpeg', 0.92);
+    };
+    img.onerror = function () { reject(new Error('image failed')); };
+    img.src = imageUrl;
+  });
+}
+
+/* Compartir fecha: flyer compuesto + mapa */
+function shareFecha(e, id) {
+  e.preventDefault();
   var imgUrl = document.getElementById(id + '_url').value;
   var waUrl = document.getElementById(id + '_wa').value;
+  var mapaUrl = document.getElementById(id + '_mapa').value;
 
-  if (navigator.share && navigator.canShare && imgUrl) {
-    fetch(imgUrl).then(function (r) { return r.blob(); }).then(function (blob) {
-      var ext = imgUrl.split('.').pop().toLowerCase();
-      var type = ext === 'png' ? 'image/png' : 'image/jpeg';
-      var file = new File([blob], 'flyer.' + ext, { type: type });
-      var shareImg = { files: [file] };
-      if (navigator.canShare(shareImg)) {
-        return navigator.share(shareImg).then(function () {
-          setTimeout(function () { location.href = waUrl; }, 300);
+  if (!imgUrl) {
+    location.href = waUrl;
+    if (mapaUrl) setTimeout(function () { window.open(mapaUrl, '_blank'); }, 500);
+    return;
+  }
+
+  generarFlyer(imgUrl, { lugar: '', ciudad: '', dia: '', mes: '', anio: '' }).then(function () { return; }).catch(function () { return; });
+
+  var idx = -1;
+  for (var i = 0; i < FECHAS.length; i++) {
+    if (imgUrl.indexOf(FECHAS[i].fotos && FECHAS[i].fotos[0] ? FECHAS[i].fotos[0] : '') > -1 && FECHAS[i].fotos) { idx = i; break; }
+  }
+  var f = idx >= 0 ? FECHAS[idx] : null;
+  var info = f ? { lugar: f.lugar, ciudad: f.ciudad, dia: f.dia, mes: f.mes, anio: f.anio } : { lugar: '', ciudad: '', dia: '', mes: '', anio: '' };
+
+  generarFlyer(imgUrl, info).then(function (file) {
+    if (navigator.share && navigator.canShare) {
+      var data = { files: [file] };
+      if (navigator.canShare(data)) {
+        return navigator.share(data).then(function () {
+          if (mapaUrl) setTimeout(function () { location.href = mapaUrl; }, 400);
         });
       }
-      location.href = waUrl;
-    }).catch(function () {
-      location.href = waUrl;
-    });
-  } else {
+    }
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(file);
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
     location.href = waUrl;
-  }
+    if (mapaUrl) setTimeout(function () { window.open(mapaUrl, '_blank'); }, 500);
+  }).catch(function () {
+    location.href = waUrl;
+    if (mapaUrl) setTimeout(function () { window.open(mapaUrl, '_blank'); }, 500);
+  });
 }
 
 /* ============================================================

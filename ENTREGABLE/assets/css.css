@@ -569,8 +569,6 @@ body::before {
   transition: color .2s;
 }
 .tour-card__mapa-link:hover { color: var(--hueso); }
-.tour-card__btn--share { border-color: #25d366; color: #25d366; margin-left: .5rem; }
-.tour-card__btn--share:hover { background: #25d366; color: #fff; }
 .tour-card__transporte {
   font-family: var(--fuente-sans);
   font-size: .7rem;
