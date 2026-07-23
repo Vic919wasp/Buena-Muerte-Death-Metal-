@@ -57,7 +57,7 @@ class AITab(QWidget):
 
     def _setup_ui(self):
         layout = QVBoxLayout(self)
-        layout.setSpacing(8)
+        layout.setSpacing(6)
 
         header = QLabel("Asistente AI")
         header.setStyleSheet("font-family:'Cinzel',serif; font-size:18px; color:#c8ccd0;")
@@ -67,70 +67,81 @@ class AITab(QWidget):
         self.status_label.setStyleSheet("color:#9aa0a6; font-size:11px;")
         layout.addWidget(self.status_label)
 
-        actions_frame = QFrame()
-        actions_frame.setStyleSheet("QFrame{border:1px solid #1f2225; padding:8px;}")
-        actions_l = QVBoxLayout(actions_frame)
+        main_split = QSplitter(Qt.Horizontal)
+        left_panel = QFrame()
+        left_panel.setStyleSheet("QFrame{border:1px solid #1f2225; padding:8px;}")
+        left_l = QVBoxLayout(left_panel)
+        left_l.setContentsMargins(6, 6, 6, 6)
 
         actions_header = QLabel("Acciones rapidas")
         actions_header.setStyleSheet("color:#7a6346; font-family:'Cinzel',serif;")
-        actions_l.addWidget(actions_header)
+        left_l.addWidget(actions_header)
 
-        btn_row1 = QHBoxLayout()
         self.scrape_btn = QPushButton("Actualizar escena ARG")
         self.scrape_btn.clicked.connect(self._scrape_scene)
-        btn_row1.addWidget(self.scrape_btn)
-        self.improve_desc_btn = QPushButton("Mejorar descripcion seleccionada")
+        left_l.addWidget(self.scrape_btn)
+
+        self.improve_desc_btn = QPushButton("Mejorar descripcion")
         self.improve_desc_btn.clicked.connect(self._improve_description)
-        btn_row1.addWidget(self.improve_desc_btn)
-        actions_l.addLayout(btn_row1)
+        left_l.addWidget(self.improve_desc_btn)
 
-        btn_row2 = QHBoxLayout()
-        self.gen_post_btn = QPushButton("Generar post para redes")
+        self.gen_post_btn = QPushButton("Generar post redes")
         self.gen_post_btn.clicked.connect(self._generate_post)
-        btn_row2.addWidget(self.gen_post_btn)
-        self.analyze_btn = QPushButton("Analizar codigo del sitio")
+        left_l.addWidget(self.gen_post_btn)
+
+        self.analyze_btn = QPushButton("Analizar codigo sitio")
         self.analyze_btn.clicked.connect(self._analyze_code)
-        btn_row2.addWidget(self.analyze_btn)
-        actions_l.addLayout(btn_row2)
+        left_l.addWidget(self.analyze_btn)
 
-        layout.addWidget(actions_frame)
+        sep = QLabel("Escena metal ARG")
+        sep.setStyleSheet("color:#7a6346; font-family:'Cinzel',serif; margin-top:8px;")
+        left_l.addWidget(sep)
 
-        scene_frame = QFrame()
-        scene_frame.setStyleSheet("QFrame{border:1px solid #1f2225; padding:8px;}")
-        scene_l = QVBoxLayout(scene_frame)
-        scene_header = QLabel("Escena metal Argentina")
-        scene_header.setStyleSheet("color:#7a6346; font-family:'Cinzel',serif;")
-        scene_l.addWidget(scene_header)
         self.scene_text = QTextEdit()
         self.scene_text.setReadOnly(True)
-        self.scene_text.setMaximumHeight(120)
-        self.scene_text.setPlaceholderText("Haz clic en 'Actualizar escena ARG' para cargar shows y noticias...")
-        scene_l.addWidget(self.scene_text)
-        layout.addWidget(scene_frame)
+        self.scene_text.setPlaceholderText("Clic en 'Actualizar escena ARG'...")
+        self.scene_text.setMaximumHeight(140)
+        left_l.addWidget(self.scene_text)
 
-        layout.addWidget(QLabel("Chat con AI:"))
+        left_l.addStretch()
+
+        token_row = QHBoxLayout()
+        token_row.addWidget(QLabel("Tokens:"))
+        self.token_label = QLabel("0")
+        self.token_label.setStyleSheet("color:#7a6346; font-size:10px; min-width:40px;")
+        token_row.addWidget(self.token_label)
+        token_row.addStretch()
+        left_l.addLayout(token_row)
+
+        main_split.addWidget(left_panel)
+
+        right_panel = QWidget()
+        right_l = QVBoxLayout(right_panel)
+        right_l.setContentsMargins(0, 0, 0, 0)
+
         self.chat_output = QTextEdit()
         self.chat_output.setReadOnly(True)
-        self.chat_output.setStyleSheet("QTextEdit{font-family:'Inter',sans-serif;}")
-        layout.addWidget(self.chat_output)
+        self.chat_output.setStyleSheet("QTextEdit{font-family:'Inter',sans-serif; background:#0d0f10; border:1px solid #1f2225; padding:8px;}")
+        right_l.addWidget(self.chat_output, 1)
 
         chat_row = QHBoxLayout()
         self.chat_input = QLineEdit()
-        self.chat_input.setPlaceholderText("Escribi tu pregunta o pedilo...")
+        self.chat_input.setPlaceholderText("Escribi tu pregunta...")
         self.chat_input.returnPressed.connect(self._send_chat)
         self.chat_input.textChanged.connect(self._update_token_count)
-        chat_row.addWidget(self.chat_input)
-        self.token_label = QLabel("0 tokens")
-        self.token_label.setStyleSheet("color:#7a6346; font-size:10px; min-width:60px;")
-        chat_row.addWidget(self.token_label)
+        chat_row.addWidget(self.chat_input, 1)
         self.send_btn = QPushButton("Enviar")
         self.send_btn.clicked.connect(self._send_chat)
         chat_row.addWidget(self.send_btn)
-        layout.addLayout(chat_row)
+        right_l.addLayout(chat_row)
+
+        main_split.addWidget(right_panel)
+        main_split.setSizes([260, 500])
+        layout.addWidget(main_split, 1)
 
         self.progress = QProgressBar()
         self.progress.setVisible(False)
-        self.progress.setStyleSheet("QProgressBar{border:1px solid #1f2225; height:4px;} QProgressBar::chunk{background:#4a0f0d;}")
+        self.progress.setStyleSheet("QProgressBar{border:1px solid #1f2225; height:3px;} QProgressBar::chunk{background:#4a0f0d;}")
         layout.addWidget(self.progress)
 
     # [003] ACCIONES AI
@@ -239,10 +250,10 @@ class AITab(QWidget):
         }
         messages = [system_msg] + self.chat_history[-5:]
         total_tokens = self._estimate_tokens(messages)
-        self.token_label.setText(f"{total_tokens} tokens")
+        self.token_label.setText(str(total_tokens))
         if total_tokens > 800:
-            self.token_label.setStyleSheet("color:#ff4444; font-size:10px; min-width:60px;")
-            self.chat_output.append(f"[⚠️ Payload alto: {total_tokens} tokens — respuesta puede tardar]\n\n")
+            self.token_label.setStyleSheet("color:#ff4444; font-size:10px; min-width:40px;")
+            self.chat_output.append(f"[⚠️ Payload alto: {total_tokens} tokens]\n\n")
         self.progress.setVisible(True)
         self.send_btn.setEnabled(False)
         self._run_ai(messages)
@@ -286,12 +297,12 @@ class AITab(QWidget):
         text = self.chat_input.text()
         est = len(text) // 3 + 5
         if est > 400:
-            self.token_label.setStyleSheet("color:#ff4444; font-size:10px; min-width:60px;")
+            self.token_label.setStyleSheet("color:#ff4444; font-size:10px; min-width:40px;")
         elif est > 250:
-            self.token_label.setStyleSheet("color:#cc8800; font-size:10px; min-width:60px;")
+            self.token_label.setStyleSheet("color:#cc8800; font-size:10px; min-width:40px;")
         else:
-            self.token_label.setStyleSheet("color:#7a6346; font-size:10px; min-width:60px;")
-        self.token_label.setText(f"{est} tokens")
+            self.token_label.setStyleSheet("color:#7a6346; font-size:10px; min-width:40px;")
+        self.token_label.setText(str(est))
 
     def get_context_for_tab(self):
         """Retorna contexto de escena para usar en otros tabs."""
