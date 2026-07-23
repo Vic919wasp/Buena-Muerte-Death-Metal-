@@ -322,6 +322,7 @@ def batch_scrape(urls: list) -> list:
 def fetch_member_info(band_name: str, role: str) -> dict:
     """Busca info específica de un integrante por rol."""
     results = {"texts": [], "images": [], "sources": []}
+    blocked = ["metal-archives.com", "twitter.com", "x.com"]
 
     site_url = "https://buena-muerte-death-metal.onrender.com"
     site = scrape_url(site_url, max_chars=3000)
@@ -343,25 +344,24 @@ def fetch_member_info(band_name: str, role: str) -> dict:
         search_results = search_web(q, num_results=5)
         for r in search_results[:3]:
             url = r["url"]
-            if any(skip in url for skip in ["twitter.com", "x.com"]):
+            if any(skip in url for skip in blocked):
                 continue
             if url in results["sources"]:
                 continue
             article = scrape_url(url, max_chars=2500)
-            if article.get("ok") and article.get("text"):
+            if article.get("ok") and article.get("text") and len(article["text"]) > 50:
                 txt = article["text"]
-                if len(txt) > 100:
-                    results["texts"].append(f"[{r['title']}]({url})\n{txt[:2000]}")
-                    results["images"].extend(article.get("images", [])[:2])
-                    results["sources"].append(url)
+                results["texts"].append(f"[{r['title']}]({url})\n{txt[:2000]}")
+                results["images"].extend(article.get("images", [])[:2])
+                results["sources"].append(url)
 
     consolidated = "\n\n---\n\n".join(results["texts"])
-    if not consolidated.strip():
+    if not consolidated.strip() or len(consolidated) < 200:
         consolidated = (
-            f"No se encontró información pública sobre el {role} de {band_name} "
-            f"en las fuentes consultadas (sitio oficial, buscadores, redes sociales). "
-            f"La información puede no estar disponible online o el integrante puede "
-            f"no tener presencia pública."
+            f"La búsqueda web sobre el {role} de {band_name} no arrojó resultados "
+            f"suficientes. Esto puede deberse a que la banda es underground y no "
+            f"tiene presencia pública documentada de sus integrantes. "
+            f"Se encontró info del sitio oficial pero sin datos específicos del {role}."
         )
     return {
         "text": consolidated[:10000],
