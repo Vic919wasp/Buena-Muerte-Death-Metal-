@@ -300,19 +300,27 @@ class AITab(QWidget):
             if not text:
                 text = "Analizá la info scrapeada y respondé."
 
-        member_keywords = [
-            "baterista", "batero", "guitarrista", "guitarrista", "bajista",
-            "integrante", "miembro", "cantante", "vocalista", "tecladista",
-            "fabi", "leguizamón", "leguizamon",
-        ]
-        is_member_query = any(k in text.lower() for k in member_keywords)
+        member_map = {
+            "baterista": "baterista", "batero": "baterista",
+            "guitarrista": "guitarrista", "guitarra": "guitarrista",
+            "bajista": "bajista", "bajo": "bajista",
+            "vocalista": "vocalista", "cantante": "vocalista",
+            "tecladista": "tecladista", "teclado": "tecladista",
+            "integrante": "integrantes", "miembro": "integrantes",
+        }
+        detected_role = ""
+        for kw, role in member_map.items():
+            if kw in text.lower():
+                detected_role = role
+                break
+        is_member_query = bool(detected_role)
         web_keywords = ["web", "sitio", "página", "pagina", "buscar", "escrapea", "scrapear", "busca"]
         is_web_request = any(k in text.lower() for k in web_keywords)
 
         if is_member_query and not web_context:
-            self.chat_output.append(f"[Buscando info del integrante en la web...]\n")
-            from services.content_scraper import fetch_band_info
-            band_data = fetch_band_info("Buena Muerte")
+            self.chat_output.append(f"[Buscando info del {detected_role} en la web...]\n")
+            from services.content_scraper import fetch_member_info
+            band_data = fetch_member_info("Buena Muerte", detected_role)
             web_context = band_data.get("text", "")[:5000]
             if band_data.get("images"):
                 web_context += f"\nImágenes encontradas: {len(band_data['images'])}"

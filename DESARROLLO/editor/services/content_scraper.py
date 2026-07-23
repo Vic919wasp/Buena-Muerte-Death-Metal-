@@ -317,3 +317,45 @@ def batch_scrape(urls: list) -> list:
     for url in urls:
         results.append(fetch_article(url))
     return results
+
+
+def fetch_member_info(band_name: str, role: str) -> dict:
+    """Busca info específica de un integrante por rol."""
+    results = {"texts": [], "images": [], "sources": []}
+
+    site_url = "https://buena-muerte-death-metal.onrender.com"
+    site = scrape_url(site_url, max_chars=3000)
+    if site.get("ok"):
+        results["texts"].append(f"[Sitio oficial]\n{site['text']}")
+        results["sources"].append(site_url)
+
+    queries = [
+        f'"{band_name}" {role}',
+        f'{band_name} {role} nombre',
+        f'"{band_name}" {role} biografia',
+        f'"{band_name}" {role} Argentina metal',
+        f'{band_name} banda {role} who is',
+    ]
+    for q in queries:
+        search_results = search_web(q, num_results=5)
+        for r in search_results[:3]:
+            url = r["url"]
+            if any(skip in url for skip in ["twitter.com", "x.com", "tiktok.com"]):
+                continue
+            if url in results["sources"]:
+                continue
+            article = scrape_url(url, max_chars=2500)
+            if article.get("ok") and article.get("text"):
+                txt = article["text"]
+                if len(txt) > 100:
+                    results["texts"].append(f"[{r['title']}]({url})\n{txt[:2000]}")
+                    results["images"].extend(article.get("images", [])[:2])
+                    results["sources"].append(url)
+
+    consolidated = "\n\n---\n\n".join(results["texts"])
+    return {
+        "text": consolidated[:10000],
+        "images": results["images"][:10],
+        "sources": results["sources"],
+        "ok": bool(results["texts"]),
+    }
