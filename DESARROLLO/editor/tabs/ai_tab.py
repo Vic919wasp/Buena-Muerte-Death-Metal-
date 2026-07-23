@@ -1,21 +1,25 @@
 """
-CONTEXTO: Pestaña de asistente AI para el editor. Integra Ollama para
-          mejorar textos, generar posts, analizar la escena metal ARG
-          y asistir en la gestión del sitio.
+CONTEXTO: Tab de asistente AI — chat, acciones rápidas editables,
+          scraper de escena ARG, análisis de código.
 ÍNDICE DE NAVEGACIÓN
-[001] IMPORTS / CLASE       - línea 14
-[002] UI / LAYOUT           - línea 35
-[003] ACCIONES AI           - línea 100
-[004] CHAT                  - línea 150
-[005] HELPERS               - línea 200
+[001] IMPORTS / CLASE        - línea 12
+[002] DEFAULT ACTIONS        - línea 30
+[003] UI / LAYOUT            - línea 42
+[004] ACCIONES AI            - línea 155
+[005] CHAT                   - línea 240
+[006] ACCIONES RÁPIDAS EDIT  - línea 290
+[007] HELPERS                - línea 340
 """
 import json
+import os
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
     QTextEdit, QLineEdit, QFrame, QSplitter, QMessageBox,
-    QComboBox, QProgressBar,
+    QComboBox, QProgressBar, QListWidget, QListWidgetItem,
+    QInputDialog, QMenu,
 )
 from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtGui import QAction
 
 from services import ai_service
 from services import scraper
@@ -24,7 +28,17 @@ from services.prompt_builder import (
     build_improve_existing_prompt,
     build_generate_post_prompt,
     build_quick_prompt,
+    BAND_INFO,
 )
+
+ACTIONS_FILE = os.path.join(os.path.dirname(__file__), "..", "quick_actions.json")
+
+DEFAULT_ACTIONS = [
+    {"label": "Actualizar escena ARG", "prompt": "", "action": "scrape"},
+    {"label": "Mejorar descripcion", "prompt": "", "action": "improve_desc"},
+    {"label": "Generar post redes", "prompt": "", "action": "gen_post"},
+    {"label": "Analizar codigo sitio", "prompt": "", "action": "analyze"},
+]
 
 
 # [001] IMPORTS / CLASE
@@ -45,13 +59,17 @@ class AIWorker(QThread):
             self.error.emit(str(e))
 
 
-# [002] UI / LAYOUT
+# [002] DEFAULT ACTIONS
+
+# [003] UI / LAYOUT
 class AITab(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.scene_data = None
         self.chat_history = []
         self._worker = None
+        self._actions = self._load_actions()
+        self._action_btns = []
         self._setup_ui()
         self._check_ollama()
 
@@ -68,30 +86,35 @@ class AITab(QWidget):
         layout.addWidget(self.status_label)
 
         main_split = QSplitter(Qt.Horizontal)
+
         left_panel = QFrame()
         left_panel.setStyleSheet("QFrame{border:1px solid #1f2225; padding:8px;}")
         left_l = QVBoxLayout(left_panel)
         left_l.setContentsMargins(6, 6, 6, 6)
 
-        actions_header = QLabel("Acciones rapidas")
-        actions_header.setStyleSheet("color:#7a6346; font-family:'Cinzel',serif;")
-        left_l.addWidget(actions_header)
+        actions_header = QHBoxLayout()
+        lbl = QLabel("Acciones rapidas")
+        lbl.setStyleSheet("color:#7a6346; font-family:'Cinzel',serif;")
+        actions_header.addWidget(lbl)
+        add_action_btn = QPushButton("+")
+        add_action_btn.setFixedSize(24, 24)
+        add_action_btn.setToolTip("Agregar accion rapida")
+        add_action_btn.clicked.connect(self._add_action)
+        actions_header.addWidget(add_action_btn)
+        actions_header.addStretch()
+        left_l.addLayout(actions_header)
 
-        self.scrape_btn = QPushButton("Actualizar escena ARG")
-        self.scrape_btn.clicked.connect(self._scrape_scene)
-        left_l.addWidget(self.scrape_btn)
+        self.actions_list = QListWidget()
+        self.actions_list.setStyleSheet("QListWidget{border:none; background:transparent;}")
+        self.actions_list.itemDoubleClicked.connect(self._edit_action)
+        self.actions_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.actions_list.customContextMenuRequested.connect(self._action_context_menu)
+        left_l.addWidget(self.actions_list)
+        self._refresh_actions_list()
 
-        self.improve_desc_btn = QPushButton("Mejorar descripcion")
-        self.improve_desc_btn.clicked.connect(self._improve_description)
-        left_l.addWidget(self.improve_desc_btn)
-
-        self.gen_post_btn = QPushButton("Generar post redes")
-        self.gen_post_btn.clicked.connect(self._generate_post)
-        left_l.addWidget(self.gen_post_btn)
-
-        self.analyze_btn = QPushButton("Analizar codigo sitio")
-        self.analyze_btn.clicked.connect(self._analyze_code)
-        left_l.addWidget(self.analyze_btn)
+        run_btn = QPushButton("Ejecutar seleccion")
+        run_btn.clicked.connect(self._run_selected_action)
+        left_l.addWidget(run_btn)
 
         sep = QLabel("Escena metal ARG")
         sep.setStyleSheet("color:#7a6346; font-family:'Cinzel',serif; margin-top:8px;")
@@ -100,7 +123,7 @@ class AITab(QWidget):
         self.scene_text = QTextEdit()
         self.scene_text.setReadOnly(True)
         self.scene_text.setPlaceholderText("Clic en 'Actualizar escena ARG'...")
-        self.scene_text.setMaximumHeight(140)
+        self.scene_text.setMaximumHeight(120)
         left_l.addWidget(self.scene_text)
 
         left_l.addStretch()
@@ -144,7 +167,7 @@ class AITab(QWidget):
         self.progress.setStyleSheet("QProgressBar{border:1px solid #1f2225; height:3px;} QProgressBar::chunk{background:#4a0f0d;}")
         layout.addWidget(self.progress)
 
-    # [003] ACCIONES AI
+    # [004] ACCIONES AI
     def _check_ollama(self):
         if ai_service.OllamaClient().is_available():
             self.status_label.setText("Ollama conectado (llama3.2:3b)")
@@ -154,9 +177,8 @@ class AITab(QWidget):
             self.status_label.setStyleSheet("color:#a44; font-size:11px;")
 
     def _scrape_scene(self):
-        self.scrape_btn.setEnabled(False)
-        self.scrape_btn.setText("Scrapeando...")
         self.progress.setVisible(True)
+        self.status_label.setText("Scrapeando escena ARG...")
 
         class ScraperWorker(QThread):
             finished = Signal(dict)
@@ -165,7 +187,7 @@ class AITab(QWidget):
                     data = scraper.force_refresh()
                     self.finished.emit(data)
                 except Exception:
-                    self.finished.emit({"error": "Error al scrapeart"})
+                    self.finished.emit({"error": "Error al scrapear"})
 
         worker = ScraperWorker()
         worker.finished.connect(self._on_scene_loaded)
@@ -174,8 +196,7 @@ class AITab(QWidget):
 
     def _on_scene_loaded(self, data):
         self.progress.setVisible(False)
-        self.scrape_btn.setEnabled(True)
-        self.scrape_btn.setText("Actualizar escena ARG")
+        self.status_label.setText("Ollama conectado (llama3.2:3b)" if ai_service.OllamaClient().is_available() else "Ollama no detectado.")
         if "error" in data:
             self.scene_text.setPlainText(data["error"])
             return
@@ -188,15 +209,11 @@ class AITab(QWidget):
             QMessageBox.information(self, "Escena", "Primero actualiza la escena ARG.")
             return
         event = {
-            "lugar": "EL TEATRITO",
-            "ciudad": "CABA",
-            "dia": "27",
-            "mes": "OCT",
-            "anio": "2026",
+            "lugar": "EL TEATRITO", "ciudad": "CABA",
+            "dia": "27", "mes": "OCT", "anio": "2026",
             "descripcion": "Show de Buena Muerte en El Teatrito",
         }
         self.progress.setVisible(True)
-        self.improve_desc_btn.setEnabled(False)
         messages = build_improve_description_prompt(event, self.scene_data)
         self._run_ai(messages, "Mejorando descripcion...")
 
@@ -205,30 +222,31 @@ class AITab(QWidget):
             QMessageBox.information(self, "Escena", "Primero actualiza la escena ARG.")
             return
         event = {
-            "lugar": "EL TEATRITO",
-            "ciudad": "CABA",
-            "dia": "27",
-            "mes": "OCT",
-            "anio": "2026",
+            "lugar": "EL TEATRITO", "ciudad": "CABA",
+            "dia": "27", "mes": "OCT", "anio": "2026",
             "descripcion": "Buena Muerte + Six Feet Under",
         }
         self.progress.setVisible(True)
-        self.gen_post_btn.setEnabled(False)
         messages = build_generate_post_prompt(event, self.scene_data)
         self._run_ai(messages, "Generando post...")
 
     def _analyze_code(self):
         self.progress.setVisible(True)
-        self.analyze_btn.setEnabled(False)
         from services import html_generator
         code = html_generator._read("assets/js.js")[:3000]
         messages = [
-            {"role": "system", "content": "Sos un experto en Python/JS/PySide6. Analiza el codigo y sugiere mejoras. Responde en español."},
-            {"role": "user", "content": f"Analiza este codigo del sitio web de una banda de metal:\n\n```\n{code}\n```"},
+            {"role": "system", "content": "Sos experto en Python/JS/PySide6. Analiza codigo y sugiere mejoras. Responde en español, sé conciso."},
+            {"role": "user", "content": f"Analiza este codigo:\n\n```\n{code}\n```"},
         ]
         self._run_ai(messages, "Analizando codigo...")
 
-    # [004] CHAT
+    def _run_custom_action(self, prompt):
+        self.progress.setVisible(True)
+        ctx = (scraper.get_scene_summary() if self.scene_data else "")[:300]
+        messages = build_quick_prompt(prompt, ctx)
+        self._run_ai(messages, "Procesando...")
+
+    # [005] CHAT
     def _send_chat(self):
         text = self.chat_input.text().strip()
         if not text:
@@ -237,18 +255,11 @@ class AITab(QWidget):
         self.chat_input.clear()
         self.chat_output.append(f"Tu: {text}\n")
         self.chat_history.append({"role": "user", "content": text})
-        ctx = (scraper.get_scene_summary() if self.scene_data else "")[:500]
-        system_msg = {
-            "role": "system",
-            "content": (
-                "Sos el asistente de Buena Muerte, banda de death metal de "
-                "Zona Sur, AMBA, Argentina. Respondé en español, sé conciso y útil. "
-                f"Contexto de escena ARG:\n{ctx}" if ctx else
-                "Sos el asistente de Buena Muerte, banda de death metal de "
-                "Zona Sur, AMBA, Argentina. Respondé en español, sé conciso y útil."
-            ),
-        }
-        messages = [system_msg] + self.chat_history[-5:]
+        ctx = (scraper.get_scene_summary() if self.scene_data else "")[:300]
+        system = "Sos asistente de Buena Muerte (death metal, Zona Sur, AMBA). Sé conciso."
+        if ctx:
+            system += f" Escena ARG: {ctx}"
+        messages = [{"role": "system", "content": system}] + self.chat_history[-5:]
         total_tokens = self._estimate_tokens(messages)
         self.token_label.setText(str(total_tokens))
         if total_tokens > 800:
@@ -271,21 +282,112 @@ class AITab(QWidget):
     def _on_ai_response(self, text):
         self.progress.setVisible(False)
         self.send_btn.setEnabled(True)
-        self.improve_desc_btn.setEnabled(True)
-        self.gen_post_btn.setEnabled(True)
-        self.analyze_btn.setEnabled(True)
         self.chat_output.append(f"AI:\n{text}\n\n")
         self.chat_history.append({"role": "assistant", "content": text})
 
     def _on_ai_error(self, error):
         self.progress.setVisible(False)
         self.send_btn.setEnabled(True)
-        self.improve_desc_btn.setEnabled(True)
-        self.gen_post_btn.setEnabled(True)
-        self.analyze_btn.setEnabled(True)
         self.chat_output.append(f"[Error: {error}]\n\n")
 
-    # [005] HELPERS
+    # [006] ACCIONES RÁPIDAS EDIT
+    def _load_actions(self):
+        if os.path.exists(ACTIONS_FILE):
+            try:
+                with open(ACTIONS_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return list(DEFAULT_ACTIONS)
+
+    def _save_actions(self):
+        os.makedirs(os.path.dirname(ACTIONS_FILE), exist_ok=True)
+        with open(ACTIONS_FILE, "w", encoding="utf-8") as f:
+            json.dump(self._actions, f, ensure_ascii=False, indent=2)
+
+    def _refresh_actions_list(self):
+        self.actions_list.clear()
+        for a in self._actions:
+            self.actions_list.addItem(a["label"])
+
+    def _add_action(self):
+        label, ok = QInputDialog.getText(self, "Nueva accion rapida", "Nombre de la accion:")
+        if not ok or not label.strip():
+            return
+        prompt, ok = QInputDialog.getMultiLineText(
+            self, "Prompt de la accion",
+            "Prompt que se enviara a la IA (dejar vacio para usar por defecto):"
+        )
+        if not ok:
+            return
+        self._actions.append({"label": label.strip(), "prompt": prompt.strip(), "action": "custom"})
+        self._save_actions()
+        self._refresh_actions_list()
+
+    def _edit_action(self, item):
+        idx = self.actions_list.row(item)
+        if idx < 0 or idx >= len(self._actions):
+            return
+        act = self._actions[idx]
+        if act.get("action") != "custom":
+            QMessageBox.information(self, "Accion fija", "Esta accion es del sistema y no se puede editar.")
+            return
+        label, ok = QInputDialog.getText(self, "Editar accion", "Nombre:", text=act["label"])
+        if ok and label.strip():
+            act["label"] = label.strip()
+        prompt, ok = QInputDialog.getMultiLineText(self, "Editar prompt", "Prompt:", text=act.get("prompt", ""))
+        if ok:
+            act["prompt"] = prompt.strip()
+        self._save_actions()
+        self._refresh_actions_list()
+
+    def _delete_action(self, idx):
+        if idx < 0 or idx >= len(self._actions):
+            return
+        act = self._actions[idx]
+        if act.get("action") != "custom":
+            QMessageBox.information(self, "Accion fija", "No se puede eliminar una accion del sistema.")
+            return
+        resp = QMessageBox.question(self, "Eliminar", f"Eliminar '{act['label']}'?")
+        if resp == QMessageBox.Yes:
+            self._actions.pop(idx)
+            self._save_actions()
+            self._refresh_actions_list()
+
+    def _action_context_menu(self, pos):
+        item = self.actions_list.itemAt(pos)
+        if not item:
+            return
+        idx = self.actions_list.row(item)
+        menu = QMenu(self)
+        edit_action = menu.addAction("Editar")
+        edit_action.triggered.connect(lambda: self._edit_action(item))
+        delete_action = menu.addAction("Eliminar")
+        delete_action.triggered.connect(lambda: self._delete_action(idx))
+        menu.exec(self.actions_list.mapToGlobal(pos))
+
+    def _run_selected_action(self):
+        item = self.actions_list.currentItem()
+        if not item:
+            return
+        idx = self.actions_list.row(item)
+        act = self._actions[idx]
+        action_type = act.get("action", "custom")
+
+        if action_type == "scrape":
+            self._scrape_scene()
+        elif action_type == "improve_desc":
+            self._improve_description()
+        elif action_type == "gen_post":
+            self._generate_post()
+        elif action_type == "analyze":
+            self._analyze_code()
+        elif action_type == "custom" and act.get("prompt"):
+            self._run_custom_action(act["prompt"])
+        else:
+            self._run_custom_action(item.text())
+
+    # [007] HELPERS
     def _estimate_tokens(self, messages):
         total = 0
         for m in messages:
@@ -305,7 +407,6 @@ class AITab(QWidget):
         self.token_label.setText(str(est))
 
     def get_context_for_tab(self):
-        """Retorna contexto de escena para usar en otros tabs."""
         if self.scene_data:
             return scraper.get_scene_summary()
         return ""
