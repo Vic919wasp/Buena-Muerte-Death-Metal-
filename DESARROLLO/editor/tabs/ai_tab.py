@@ -218,10 +218,11 @@ class AITab(QWidget):
         text = self.chat_input.text().strip()
         if not text:
             return
+        text = text[:500]
         self.chat_input.clear()
         self.chat_output.append(f"Tu: {text}\n")
         self.chat_history.append({"role": "user", "content": text})
-        ctx = scraper.get_scene_summary() if self.scene_data else ""
+        ctx = (scraper.get_scene_summary() if self.scene_data else "")[:500]
         system_msg = {
             "role": "system",
             "content": (
@@ -232,7 +233,7 @@ class AITab(QWidget):
                 "Zona Sur, AMBA, Argentina. Respondé en español, sé conciso y útil."
             ),
         }
-        messages = [system_msg] + self.chat_history[-10:]
+        messages = [system_msg] + self.chat_history[-5:]
         self.progress.setVisible(True)
         self.send_btn.setEnabled(False)
         self._run_ai(messages)

@@ -44,21 +44,21 @@ def build_band_context() -> str:
 
 
 def build_scene_context(scene_data: Optional[dict] = None) -> str:
-    """Arma contexto de la escena metal ARG."""
+    """Arma contexto de la escena metal ARG (máx 300 chars)."""
     if not scene_data:
         return "Contexto de escena no disponible."
     lines = ["Escena metal argentina actual:"]
     if scene_data.get("shows"):
         lines.append("Shows confirmados en Buenos Aires:")
-        for s in scene_data["shows"][:10]:
+        for s in scene_data["shows"][:5]:
             fecha = s.get("fecha", "")
             lugar = s.get("lugar", s.get("titulo", ""))
             lines.append(f"  - {fecha} en {lugar}")
     if scene_data.get("noticias"):
         lines.append("Noticias recientes:")
-        for n in scene_data["noticias"][:5]:
+        for n in scene_data["noticias"][:3]:
             lines.append(f"  - {n.get('titulo', '')}")
-    return "\n".join(lines)
+    return "\n".join(lines)[:300]
 
 
 # [003] BUILDERS DE PROMPT
@@ -70,21 +70,13 @@ def build_improve_description_prompt(event: dict, scene_data: Optional[dict] = N
 
     system = (
         f"Sos el redactor de {BAND_INFO['nombre']}, banda de {BAND_INFO['genero']} "
-        f"de {BAND_INFO['zona']}. Tu tarea es generar una descripción atractiva y "
-        f"concisa para un show de la banda en un flyer de Instagram.\n\n"
-        f"ESTILO:\n"
-        f"- Tono: underground, directo, pasional, argentino\n"
-        f"- Usá emojis de metal: 🤘🔥💀🎸🥁\n"
-        f"- Longitud: 2-4 oraciones máximo\n"
-        f"- Incluí: fecha, lugar, bandas invitadas si las hay, hora si hay\n"
-        f"- CTA: cómo conseguir entradas (WhatsApp o link)\n"
-        f"- NO incluyas info que no esté en los datos del evento\n"
-        f"- Respetá el género: death metal, no heavy ni rock\n\n"
-        f"DATOS DE LA BANDA:\n{band_ctx}\n\n"
-        f"ESTILO DE COMUNICACIÓN: como si le hablaras a la gente del under, "
-        f"someros de metal, que conocen la escena. Sin vueltas.\n\n"
-        f"FORMATO DE SALIDA: solo el texto de la descripción, sin comillas "
-        f"ni explicaciones."
+        f"de {BAND_INFO['zona']}. Generá una descripción para un show de la banda.\n"
+        f"Estilo: underground, directo, pasional, argentino. "
+        f"Emojis de metal: 🤘🔥💀🎸🥁. 2-4 oraciones máximo. "
+        f"Incluí fecha, lugar, bandas invitadas si las hay. "
+        f"CTA: WhatsApp {BAND_INFO['whatsapp']}. "
+        f"No inventes info. Death metal, no heavy ni rock. "
+        f"DATOS: {band_ctx}"
     )
 
     user_msg = f"Generá la descripción para este show:\n\n{event_str}"
@@ -105,13 +97,10 @@ def build_improve_existing_prompt(text: str, event: dict = None,
         f"Sos el community manager de {BAND_INFO['nombre']}, "
         f"{BAND_INFO['genero']} de {BAND_INFO['zona']}. "
         f"Mejorá el texto dado para que sea más impactante y profesional, "
-        f"manteniendo el tono underground argentino.\n\n"
-        f"REGLAS:\n"
-        f"- Mantené la info correcta, no inventes datos\n"
-        f"- Mejorá gramática y claridad\n"
-        f"- Hacelo más atractivo para la escena metal\n"
-        f"- Longitud similar al original\n\n"
-        f"DATOS DE LA BANDA:\n{band_ctx}"
+        f"manteniendo el tono underground argentino. "
+        f"Reglas: mantené la info correcta, mejorá gramática, "
+        f"hacelo más atractivo para la escena metal, longitud similar al original. "
+        f"DATOS: {band_ctx}"
     )
 
     user_msg = f"Mejorá este texto:\n\n---\n{text}\n---"
@@ -133,17 +122,12 @@ def build_generate_post_prompt(event: dict, scene_data: Optional[dict] = None) -
     system = (
         f"Sos el community manager de {BAND_INFO['nombre']}, "
         f"{BAND_INFO['genero']} de {BAND_INFO['zona']}. "
-        f"Generá un post para Instagram/Facebook sobre un show.\n\n"
-        f"ESTILO:\n"
-        f"- Tono: underground, directo, argentino\n"
-        f"- Emojis: 🤘🔥💀🎸🥁\n"
-        f"- Hashtags: #BuenaMuerte #DeathMetal #MetalArgentino #Underground "
-        f"#BuenosAires #ZonaSur #MetalEnVivo\n"
-        f"- Longitud: 4-8 oraciones\n"
-        f"- Incluí: fecha, lugar, hora si hay, cómo entrar\n"
-        f"- CTA: WhatsApp o link de entradas\n"
-        f"- Cerrá con algo que genere expectativa\n\n"
-        f"DATOS DE LA BANDA:\n{band_ctx}"
+        f"Generá un post para Instagram/Facebook sobre un show.\n"
+        f"Estilo: underground, directo, argentino. "
+        f"Emojis: 🤘🔥💀🎸🥁. Hashtags: #BuenaMuerte #DeathMetal #MetalArgentino. "
+        f"4-8 oraciones. Incluí fecha, lugar, cómo entrar. "
+        f"CTA: WhatsApp {BAND_INFO['whatsapp']}. "
+        f"DATOS: {band_ctx}"
     )
 
     user_msg = f"Generá el post para este show:\n\n{event_str}"
@@ -158,8 +142,8 @@ def build_quick_prompt(user_input: str, context: str = "") -> list:
     band_ctx = build_band_context()
     system = (
         f"Sos el asistente de {BAND_INFO['nombre']}, {BAND_INFO['genero']} "
-        f"de {BAND_INFO['zona']}. Respondé en español, sé conciso y útil.\n\n"
-        f"INFO BANDA:\n{band_ctx}"
+        f"de {BAND_INFO['zona']}. Respondé en español, sé conciso. "
+        f"INFO: {band_ctx}"
     )
     if context:
         system += f"\n\nCONTEXTO ADICIONAL:\n{context}"

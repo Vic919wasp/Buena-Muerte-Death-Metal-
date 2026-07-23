@@ -17,7 +17,7 @@ from typing import Optional, Generator
 # [001] CONFIG / CONSTANTES
 OLLAMA_BASE_URL = "http://localhost:11434"
 OLLAMA_MODEL = "llama3.2:3b"
-TIMEOUT_SECONDS = 120
+TIMEOUT_SECONDS = 60
 
 
 # [002] CLIENTE OLLAMA
@@ -64,7 +64,7 @@ def chat(messages: list, model: str = OLLAMA_MODEL,
         "model": model,
         "messages": messages,
         "stream": stream,
-        "options": {"temperature": temperature, "num_predict": 2048},
+        "options": {"temperature": temperature, "num_predict": 512},
     }
     try:
         r = requests.post(
@@ -85,12 +85,12 @@ def chat(messages: list, model: str = OLLAMA_MODEL,
 
 def chat_stream(messages: list, model: str = OLLAMA_MODEL,
                 temperature: float = 0.7) -> Generator[str, None, None]:
-    """Versión streaming del chat — genera tokensuno a uno."""
+    """Versión streaming del chat — genera tokens uno a uno."""
     payload = {
         "model": model,
         "messages": messages,
         "stream": True,
-        "options": {"temperature": temperature, "num_predict": 2048},
+        "options": {"temperature": temperature, "num_predict": 512},
     }
     try:
         r = requests.post(
