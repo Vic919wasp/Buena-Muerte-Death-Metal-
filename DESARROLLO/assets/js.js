@@ -28,16 +28,6 @@ var WHATSAPP_CANTANTE = '5491164377706';
 var REDES_FOOTER = '\n\n🔗 *Seguinos en:*\n🌐 buena-muerte-death-metal.onrender.com\n🎵 open.spotify.com/intl-es/artist/5q9MTB7bYNx20VzAsYTblL\n🎬 youtube.com/results?search_query=buena+muerte+death+metal\n📸 instagram.com/buena.muerte';
 var FECHAS = [
   {
-    dia: '02',
-    mes: 'AGO',
-    anio: '2026',
-    lugar: 'Reventados Bar',
-    ciudad: 'Quilmes, GBA',
-    link: '#',
-    transporte: 'Colectivo 98, Tren Roca',
-    fotos: ['assets/posts/post-01.jpg']
-  },
-  {
     dia: '24',
     mes: 'JUL',
     anio: '2026',
@@ -45,6 +35,17 @@ var FECHAS = [
     ciudad: 'CABA',
     mapa: 'https://maps.google.com/maps?q=av.+alvarez+thomas+1078+CABA&output=embed',
     fotos: ['assets/tour/Fecha Brutal death en Gier.jpeg']
+  },
+  {
+    dia: '22',
+    mes: 'JUL',
+    anio: '2026',
+    lugar: 'EL TEATRITO',
+    ciudad: 'CABA',
+    link: '#',
+    mapa: 'https://maps.google.com/maps?q=Sarmiento+1752+CABA&output=embed',
+    descripcion: 'Martes 27 de Octubre. Tocamos con Six Feet Under!!!!. Terrible!!!. Anticipadas por whatsapp!!!!! Vamos que quedan pocas!!!. Nos vemos ahi!!!.',
+    fotos: ['assets/tour/teatrito-sixel-feet.jpg']
   }
 ];
 
