@@ -168,7 +168,7 @@ function renderFechas() {
       (f.transporte ? '\n🚌 ' + f.transporte + '\n' : '') +
       (f.mapa ? '\n🗺️ Ver ubicación: ' + mapaLink + '\n' : '') +
       '\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE;
-    var shareUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText);
+    var shareUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(shareText);
     var shareId = 'share_' + f.dia + '_' + (f.mes || '').replace(/\W/g, '');
     var share = '<button class="tour-card__btn tour-card__btn--share" onclick="shareFecha(\'' + shareId + '\')">COMPARTIR FECHA ›</button>' +
       '<input type="hidden" id="' + shareId + '_url" value="' + (f.fotos && f.fotos.length ? location.origin + '/' + f.fotos[0] : '') + '">' +
@@ -184,10 +184,9 @@ function renderFechas() {
   }).join('');
 }
 
-/* Compartir fecha en 2 mensajes: primero imagen, luego texto */
+/* Compartir fecha: imagen primero (Web Share API), luego WhatsApp */
 function shareFecha(id) {
   var imgUrl = document.getElementById(id + '_url').value;
-  var text = decodeURIComponent(document.getElementById(id + '_text').value);
   var waUrl = document.getElementById(id + '_wa').value;
 
   if (navigator.share && navigator.canShare && imgUrl) {
@@ -197,19 +196,16 @@ function shareFecha(id) {
       var file = new File([blob], 'flyer.' + ext, { type: type });
       var shareImg = { files: [file] };
       if (navigator.canShare(shareImg)) {
-        return navigator.share(shareImg);
+        return navigator.share(shareImg).then(function () {
+          setTimeout(function () { location.href = waUrl; }, 300);
+        });
       }
-    }).then(function () {
-      setTimeout(function () { window.open(waUrl, '_blank'); }, 500);
+      location.href = waUrl;
     }).catch(function () {
-      window.open(imgUrl, '_blank');
-      setTimeout(function () { window.open(waUrl, '_blank'); }, 800);
+      location.href = waUrl;
     });
-  } else if (imgUrl) {
-    window.open(imgUrl, '_blank');
-    setTimeout(function () { window.open(waUrl, '_blank'); }, 800);
   } else {
-    window.open(waUrl, '_blank');
+    location.href = waUrl;
   }
 }
 
