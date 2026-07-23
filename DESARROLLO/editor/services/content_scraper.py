@@ -216,6 +216,47 @@ def fetch_article(url: str) -> dict:
     }
 
 
+def scrape_social_media(band_name: str = "Buena Muerte") -> dict:
+    """Busca y scrapea redes sociales de la banda."""
+    results = {"texts": [], "images": [], "sources": []}
+
+    queries_social = [
+        f"{band_name} instagram.com",
+        f"{band_name} facebook.com",
+        f"{band_name} youtube.com canal",
+        f"{band_name} spotify artista",
+        f"{band_name} tiktok",
+        f"{band_name} twitter OR x.com",
+    ]
+    for q in queries_social:
+        search_results = search_web(q, num_results=3)
+        for r in search_results[:2]:
+            url = r["url"]
+            if url in results["sources"]:
+                continue
+            is_social = any(s in url for s in [
+                "instagram.com", "facebook.com", "youtube.com",
+                "spotify.com", "open.spotify.com", "tiktok.com",
+                "twitter.com", "x.com"
+            ])
+            if is_social:
+                data = scrape_url(url, max_chars=2000)
+                if data.get("ok") and data.get("text"):
+                    txt = data["text"]
+                    if len(txt) > 50:
+                        results["texts"].append(f"[{r['title']}]({url})\n{txt[:1500]}")
+                        results["images"].extend(data.get("images", [])[:3])
+                        results["sources"].append(url)
+
+    consolidated = "\n\n---\n\n".join(results["texts"])
+    return {
+        "text": consolidated[:6000],
+        "images": results["images"][:8],
+        "sources": results["sources"],
+        "ok": bool(results["texts"]),
+    }
+
+
 def fetch_band_info(band_name: str = "Buena Muerte") -> dict:
     """Busca info de la banda en múltiples fuentes y consolida."""
     results = {"texts": [], "images": [], "sources": []}
@@ -228,33 +269,43 @@ def fetch_band_info(band_name: str = "Buena Muerte") -> dict:
         results["sources"].append(site_url)
 
     queries = [
-        f"{band_name} death metal argentina bio integrantes",
-        f"{band_name} Favio Leguizamón cantante vocalista",
-        f"{band_name} Catalepsia disco review",
-        f"{band_name} Dios Es Sádico EP",
-        f"{band_name} shows 2024 2025 2026 Argentina",
-        f"{band_name} Macabre Records",
+        f'"{band_name}" integrantes miembros banda',
+        f'"{band_name}" baterista guitarrista bajista',
+        f'"{band_name}" "Favio Leguizamón" bio',
+        f'"{band_name}" death metal Argentina Zona Sur',
+        f'"{band_name}" Catalepsia 2024 review',
+        f'"{band_name}" shows conciertos Argentina 2024 2025',
+        f'"{band_name}" Instagram Facebook',
+        f'"{band_name}" youtube canal',
+        f'"{band_name}" Spotify Apple Music',
     ]
     for q in queries:
         search_results = search_web(q, num_results=5)
         for r in search_results[:3]:
             url = r["url"]
-            if any(skip in url for skip in ["youtube.com", "facebook.com", "twitter.com", "x.com", "tiktok.com"]):
+            if any(skip in url for skip in ["twitter.com", "x.com", "tiktok.com"]):
                 continue
             if url in results["sources"]:
                 continue
-            article = scrape_url(url, max_chars=2000)
+            article = scrape_url(url, max_chars=2500)
             if article.get("ok") and article.get("text"):
                 txt = article["text"]
                 if len(txt) > 100:
-                    results["texts"].append(f"[{r['title']}]\n{txt[:1500]}")
+                    results["texts"].append(f"[{r['title']}]({url})\n{txt[:2000]}")
                     results["images"].extend(article.get("images", [])[:2])
                     results["sources"].append(url)
 
     consolidated = "\n\n---\n\n".join(results["texts"])
+
+    social = scrape_social_media(band_name)
+    if social.get("ok"):
+        consolidated += "\n\n--- REDES SOCIALES ---\n\n" + social["text"]
+        results["images"].extend(social.get("images", []))
+        results["sources"].extend(social.get("sources", []))
+
     return {
-        "text": consolidated[:8000],
-        "images": results["images"][:8],
+        "text": consolidated[:12000],
+        "images": results["images"][:10],
         "sources": results["sources"],
         "ok": bool(results["texts"]),
     }

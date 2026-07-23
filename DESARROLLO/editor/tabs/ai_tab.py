@@ -313,7 +313,7 @@ class AITab(QWidget):
             self.chat_output.append(f"[Buscando info del integrante en la web...]\n")
             from services.content_scraper import fetch_band_info
             band_data = fetch_band_info("Buena Muerte")
-            web_context = band_data.get("text", "")[:4000]
+            web_context = band_data.get("text", "")[:5000]
             if band_data.get("images"):
                 web_context += f"\nImágenes encontradas: {len(band_data['images'])}"
 
