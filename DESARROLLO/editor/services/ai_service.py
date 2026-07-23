@@ -16,8 +16,8 @@ from typing import Optional, Generator
 
 # [001] CONFIG / CONSTANTES
 OLLAMA_BASE_URL = "http://localhost:11434"
-OLLAMA_MODEL = "qwen2.5:1.5b"
-TIMEOUT_SECONDS = 45
+OLLAMA_MODEL = "llama3.2:3b"
+TIMEOUT_SECONDS = 90
 
 
 # [002] CLIENTE OLLAMA
@@ -185,6 +185,24 @@ def generate_description(event_info: dict) -> str:
         {"role": "system", "content": system},
         {"role": "user", "content": f"Describí esta fecha:\n\n{info_str}"},
     ])
+
+
+# [006] WEB SCRAPING PARA AI
+def scrape_url(url: str) -> str:
+    """Scrapea una URL y retorna el texto extraído."""
+    try:
+        from bs4 import BeautifulSoup
+        r = requests.get(url, timeout=15, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        })
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for tag in soup(["script", "style", "nav", "footer", "header"]):
+            tag.decompose()
+        text = soup.get_text(separator="\n", strip=True)
+        return text[:4000]
+    except Exception as e:
+        return f"[Error al scrapear {url}: {e}]"
 
 
 # [006] UTILIDADES

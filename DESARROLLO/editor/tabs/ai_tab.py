@@ -278,7 +278,15 @@ class AITab(QWidget):
             return
         text = text[:500]
         import re
-        text = re.sub(r'https?://\S+', '[enlace omitido]', text)
+        urls = re.findall(r'https?://\S+', text)
+        web_context = ""
+        if urls:
+            for url in urls[:2]:
+                self.chat_output.append(f"[Scrapeando {url}...]\n")
+                web_context += ai_service.scrape_url(url) + "\n"
+            text = re.sub(r'https?://\S+', '', text).strip()
+            if not text:
+                text = "Armame una bio completa basada en la info scrapeada."
         self.chat_input.clear()
         self.chat_output.append(f"Tu: {text}\n")
         self.chat_history.append({"role": "user", "content": text})
@@ -289,7 +297,9 @@ class AITab(QWidget):
             "WhatsApp: 5491164377706. Sé conciso y directo."
         )
         if ctx:
-            system += f" Escena ARG reciente: {ctx}"
+            system += f" Escena ARG: {ctx}"
+        if web_context:
+            system += f"\n\nINFO SCRAPEADA DE LA WEB (usá esta info como base, no inventes):\n{web_context[:2000]}"
         messages = [{"role": "system", "content": system}] + self.chat_history[-5:]
         total_tokens = self._estimate_tokens(messages)
         self.token_label.setText(str(total_tokens))
