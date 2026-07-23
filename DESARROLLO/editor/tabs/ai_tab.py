@@ -118,7 +118,11 @@ class AITab(QWidget):
         self.chat_input = QLineEdit()
         self.chat_input.setPlaceholderText("Escribi tu pregunta o pedilo...")
         self.chat_input.returnPressed.connect(self._send_chat)
+        self.chat_input.textChanged.connect(self._update_token_count)
         chat_row.addWidget(self.chat_input)
+        self.token_label = QLabel("0 tokens")
+        self.token_label.setStyleSheet("color:#7a6346; font-size:10px; min-width:60px;")
+        chat_row.addWidget(self.token_label)
         self.send_btn = QPushButton("Enviar")
         self.send_btn.clicked.connect(self._send_chat)
         chat_row.addWidget(self.send_btn)
@@ -234,6 +238,11 @@ class AITab(QWidget):
             ),
         }
         messages = [system_msg] + self.chat_history[-5:]
+        total_tokens = self._estimate_tokens(messages)
+        self.token_label.setText(f"{total_tokens} tokens")
+        if total_tokens > 800:
+            self.token_label.setStyleSheet("color:#ff4444; font-size:10px; min-width:60px;")
+            self.chat_output.append(f"[⚠️ Payload alto: {total_tokens} tokens — respuesta puede tardar]\n\n")
         self.progress.setVisible(True)
         self.send_btn.setEnabled(False)
         self._run_ai(messages)
@@ -266,6 +275,24 @@ class AITab(QWidget):
         self.chat_output.append(f"[Error: {error}]\n\n")
 
     # [005] HELPERS
+    def _estimate_tokens(self, messages):
+        total = 0
+        for m in messages:
+            c = m.get("content", "")
+            total += len(c) // 3 + 5
+        return total
+
+    def _update_token_count(self):
+        text = self.chat_input.text()
+        est = len(text) // 3 + 5
+        if est > 400:
+            self.token_label.setStyleSheet("color:#ff4444; font-size:10px; min-width:60px;")
+        elif est > 250:
+            self.token_label.setStyleSheet("color:#cc8800; font-size:10px; min-width:60px;")
+        else:
+            self.token_label.setStyleSheet("color:#7a6346; font-size:10px; min-width:60px;")
+        self.token_label.setText(f"{est} tokens")
+
     def get_context_for_tab(self):
         """Retorna contexto de escena para usar en otros tabs."""
         if self.scene_data:
