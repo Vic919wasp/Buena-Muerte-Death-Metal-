@@ -1,0 +1,22 @@
+
+============================================================
+2026-07-23T02:36:34.308442
+Traceback (most recent call last):
+  File "D:\Proyectos WARP\Proyecto Fabio Guernica\DESARROLLO\editor\main.py", line 123, in <module>
+    window = MainWindow()
+  File "D:\Proyectos WARP\Proyecto Fabio Guernica\DESARROLLO\editor\main.py", line 61, in __init__
+    tabs.addTab(SettingsTab(), "Publicar")
+                ~~~~~~~~~~~^^
+  File "D:\Proyectos WARP\Proyecto Fabio Guernica\DESARROLLO\editor\tabs\settings_tab.py", line 22, in __init__
+    self._refresh_status()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos WARP\Proyecto Fabio Guernica\DESARROLLO\editor\tabs\settings_tab.py", line 82, in _refresh_status
+    log = site_publisher.get_log(5)
+  File "D:\Proyectos WARP\Proyecto Fabio Guernica\DESARROLLO\editor\services\site_publisher.py", line 57, in get_log
+    ok, out, err = _run(f"git log --oneline -{n}")
+                   ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Proyectos WARP\Proyecto Fabio Guernica\DESARROLLO\editor\services\site_publisher.py", line 20, in _run
+    return result.returncode == 0, result.stdout.strip(), result.stderr.strip()
+                                   ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'strip'
+

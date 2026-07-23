@@ -17,7 +17,7 @@ def _run(cmd, cwd=SITE_ROOT):
     result = subprocess.run(
         cmd, shell=True, cwd=cwd, capture_output=True, text=True, timeout=30
     )
-    return result.returncode == 0, result.stdout.strip(), result.stderr.strip()
+    return result.returncode == 0, (result.stdout or "").strip(), (result.stderr or "").strip()
 
 
 # [002] PUBLICAR
