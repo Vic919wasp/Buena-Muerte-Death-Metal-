@@ -341,9 +341,11 @@ class AITab(QWidget):
             "Sos el asistente de Buena Muerte, death metal, Zona Sur, AMBA. "
             "Cantante: Favio Leguizamón. Sello: Macabre Records. "
             "WhatsApp: 5491164377706. "
-            "Si tenés info scrapeada de la web, usala como fuente principal. "
-            "NO inventes datos que no estén en la info scrapeada. "
-            "Si no tenés info scrapeada, aclará que no encontraste datos."
+            "REGLA CRÍTICA: Si la info scrapeada NO contiene datos sobre "
+            "lo que te piden, decí EXPLÍCITAMENTE 'No encontré información "
+            "sobre [tema] en las fuentes consultadas'. NO inventes nombres, "
+            "fechas, discografías ni nada que no esté en el texto scrapeado. "
+            "Inventar datos es PEOR que no tener info."
         )
         if ctx:
             system += f" Escena ARG: {ctx}"

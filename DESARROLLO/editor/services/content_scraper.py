@@ -335,12 +335,15 @@ def fetch_member_info(band_name: str, role: str) -> dict:
         f'"{band_name}" {role} biografia',
         f'"{band_name}" {role} Argentina metal',
         f'{band_name} banda {role} who is',
+        f'"{band_name}" {role} instagram',
+        f'"{band_name}" {role} entrevista interview',
+        f'"{band_name}" members lineup',
     ]
     for q in queries:
         search_results = search_web(q, num_results=5)
         for r in search_results[:3]:
             url = r["url"]
-            if any(skip in url for skip in ["twitter.com", "x.com", "tiktok.com"]):
+            if any(skip in url for skip in ["twitter.com", "x.com"]):
                 continue
             if url in results["sources"]:
                 continue
@@ -353,6 +356,13 @@ def fetch_member_info(band_name: str, role: str) -> dict:
                     results["sources"].append(url)
 
     consolidated = "\n\n---\n\n".join(results["texts"])
+    if not consolidated.strip():
+        consolidated = (
+            f"No se encontró información pública sobre el {role} de {band_name} "
+            f"en las fuentes consultadas (sitio oficial, buscadores, redes sociales). "
+            f"La información puede no estar disponible online o el integrante puede "
+            f"no tener presencia pública."
+        )
     return {
         "text": consolidated[:10000],
         "images": results["images"][:10],
