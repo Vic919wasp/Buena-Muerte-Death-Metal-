@@ -1,5 +1,4 @@
 .opencode/
-imagenes/
 __pycache__/
 venv/
 *.bak
@@ -9,5 +8,6 @@ venv/
 Thumbs.db
 Backups/
 ENTREGABLE/
+editor/
 editor_config.json
 **/editor_config.json
