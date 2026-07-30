@@ -1,0 +1,53 @@
+<!-- ============================================================
+     CONTEXTO: Página de error 404. Mantiene la estética del sitio
+               y redirige al home tras 5 segundos.
+     ============================================================
+     ÍNDICE DE NAVEGACIÓN
+     [001] HEAD / META         - línea 16
+     [002] ESTRUCTURA HTML     - línea 27
+     [003] LÓGICA JS           - línea 42
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Buena Muerte</title>
+<meta name="description" content="Página no encontrada.">
+<meta property="og:title" content="404 — Buena Muerte">
+<meta property="og:description" content="Página no encontrada.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css.css">
+</head>
+<body>
+<canvas id="sparkles"></canvas>
+
+<!-- [002] ESTRUCTURA HTML -->
+<section class="section" style="min-height:80vh;display:flex;align-items:center;justify-content:center;text-align:center;">
+  <div class="container">
+    <span class="section__eyebrow">§ Error 404</span>
+    <h1 class="section__title">Página no encontrada</h1>
+    <p class="section__intro">El documento que buscás no existe o fue movido.</p>
+    <p style="color:var(--bronce-claro);font-size:.85rem;margin-bottom:2rem;">Serás redirigido al home en <span id="countdown">5</span> segundos.</p>
+    <div style="text-align:center;">
+      <a href="index.html" class="btn">Volver al inicio ›</a>
+    </div>
+  </div>
+</section>
+
+<!-- [003] LÓGICA JS -->
+<script>
+(function() {
+  var s = 5;
+  var el = document.getElementById('countdown');
+  var timer = setInterval(function() {
+    s--;
+    if (el) el.textContent = s;
+    if (s <= 0) { clearInterval(timer); location.href = 'index.html'; }
+  }, 1000);
+})();
+</script>
+</body>
+</html>
