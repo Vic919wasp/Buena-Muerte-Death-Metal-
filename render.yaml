@@ -2,7 +2,7 @@ services:
   - type: web
     name: buena-muerte
     runtime: static
-    branch: master
+    branch: main
     buildCommand: echo "Static site — no build needed"
     staticPublishPath: .
     routes:

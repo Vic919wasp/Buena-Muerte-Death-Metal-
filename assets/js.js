@@ -36,7 +36,7 @@ var FECHAS = [
     ciudad: 'CABA',
     mapa: 'https://maps.google.com/maps?q=MONTEVIDEO+175+-+CONGRESO&output=embed',
     transporte: '151 - 168 - 98 -60',
-    descripcion: '⛧⛧⛧Cumple Macabro ⛧⛧⛧ \nConmemorando el cumpleaños de Ramón Macabra Records!!!!\n⚰️Líder fundador de Dislepsia!!!⚰️\nTOCAMOS: Dislepsia. Morferus. Uno  Mata. RIGOR MORTIS. BUENA MUERTE!!!!',
+    descripcion: '⛧⛧⛧Cumple Macabro ⛧⛧⛧ \nConmemorando el cumpleaños de Ramón Macabra Records!!!!!\n⚰️Líder fundador de Dislepsia!!!!⚰️\nTOCAMOS: Dislepsia. Morferus. Uno  Mata. RIGOR MORTIS. BUENA MUERTE!!!!',
     fotos: ['assets/tour/IMG Cumple Macabro_3.jpeg']
   },
   {
