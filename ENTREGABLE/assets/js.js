@@ -14,9 +14,10 @@
    [06] Tour render           - línea 183
    [07] Spotify lazy load     - línea 268
    [08] Newsletter form       - línea 292
-   [09] Share buttons         - línea 368
-   [10] Fog                   - línea 433
-   [11] Nav scroll mobile     - línea 498
+    [09] Share buttons         - línea 368
+    [10] Fog                   - línea 433
+    [11] Nav scroll mobile     - línea 498
+    [12] Init global           - línea 530
    ============================================================ */
 
 /* EDITAR acá para cargar fechas. Vacío = estado cero visible.
@@ -29,12 +30,14 @@ var REDES_FOOTER = '\n\n🔗 *Seguinos en:*\n🌐 buena-muerte-death-metal.onren
 var FECHAS = [
   {
     dia: '08',
-    mes: 'AUG',
+    mes: 'AGO',
     anio: '2026',
-    lugar: 'Melonio Bar',
+    lugar: 'MELONIO BAR',
     ciudad: 'CABA',
-    descripcion: 'Cumple Macabro!!!!!!!!!  - Una noche de festejo festejo y Death Metal -\nConmemorando el cumpleaños de Ramón Macabra Records!!!!!!\nLíder fundador de la legendaria banda Dislepsia!!!!!\nVas a poder escuchar a Dislepia, Morferus, Uno Mata, RIGOR MORTIS y BUENA MUERTE.',
-    fotos: ['assets/tour/IMG Cumple Macabro.jpeg']
+    mapa: 'https://maps.google.com/maps?q=MONTEVIDEO+175+-+CONGRESO&output=embed',
+    transporte: '151 - 168 - 98 -60',
+    descripcion: '⛧⛧⛧Cumple Macabro ⛧⛧⛧ \nConmemorando el cumpleaños de Ramón Macabra Records!!!!!\n⚰️Líder fundador de Dislepsia⚰️\nTOCAMOS: Dislepsia. Morferus. Uno  Mata. RIGOR MORTIS. BUENA MUERTE!!!!',
+    fotos: ['assets/tour/IMG Cumple Macabro_1.jpeg']
   },
   {
     dia: '24',
@@ -44,28 +47,6 @@ var FECHAS = [
     ciudad: 'CABA',
     mapa: 'https://maps.google.com/maps?q=av.+alvarez+thomas+1078+CABA&output=embed',
     fotos: ['assets/tour/Fecha Brutal death en Gier.jpeg']
-  },
-  {
-    dia: '08',
-    mes: 'AUG',
-    anio: '2026',
-    lugar: 'MELONIO BAR',
-    ciudad: 'CABA',
-    mapa: 'https://maps.google.com/maps?q=MONTEVIDEO+175+-+CONGRESO&output=embed',
-    transporte: '151 - 168 - 98 -60',
-    descripcion: '⛧⛧⛧Cumple Macabro ⛧⛧⛧ \nConmemorando el cumpleaños de Ramón Macabra Records!!!!\n⚰️Líder fundador de Dislepsia⚰️\nTOCAMOS: Dislepsia. Morferus. Uno  Mata. RIGOR MORTIS. BUENA MUERTE!!!!',
-    fotos: ['assets/tour/IMG Cumple Macabro_1.jpeg']
-  },
-  {
-    dia: '27',
-    mes: 'OCT',
-    anio: '2026',
-    lugar: 'EL TEATRITO2',
-    ciudad: 'CABA',
-    link: '#',
-    mapa: 'https://maps.google.com/maps?q=Sarmiento+1752+CABA&output=embed',
-    descripcion: 'Martes 27 de Octubre. Tocamos con Six Feet Under!!!!. Terrible!!!. Anticipadas por whatsapp!!!!! Vamos que quedan pocas!!!. Nos vemos ahi!!!.',
-    fotos: ['assets/tour/teatrito-sixel-feet.jpg']
   },
   {
     dia: '27',
@@ -158,7 +139,7 @@ function initSmoothScroll() {
 }
 
 /* ============================================================
-   [06] Tour render
+   [06] Tour render — llamado desde [12] Init global
    ============================================================ */
 function renderFechas() {
   var empty = qs('#tourEmpty');
@@ -475,6 +456,7 @@ function initFog() {
 /* ============================================================
    [11] Nav scroll infinito mobile + touch + mouse drag
    ============================================================ */
+
 function initNavScroll() {
   var track = document.querySelector('.nav-track');
   if (!track) return;
@@ -557,6 +539,8 @@ document.addEventListener('DOMContentLoaded', function () {
   initFog();
   initShareButtons();
   initNavScroll();
+  renderFechas();
+  renderFechas();
 
   // Visit counter
   var counterEl = document.getElementById('visitCounter');

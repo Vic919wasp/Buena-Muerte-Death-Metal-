@@ -14,9 +14,10 @@
    [06] Tour render           - línea 183
    [07] Spotify lazy load     - línea 268
    [08] Newsletter form       - línea 292
-   [09] Share buttons         - línea 368
-   [10] Fog                   - línea 433
-   [11] Nav scroll mobile     - línea 498
+    [09] Share buttons         - línea 368
+    [10] Fog                   - línea 433
+    [11] Nav scroll mobile     - línea 498
+    [12] Init global           - línea 530
    ============================================================ */
 
 /* EDITAR acá para cargar fechas. Vacío = estado cero visible.
@@ -138,7 +139,7 @@ function initSmoothScroll() {
 }
 
 /* ============================================================
-   [06] Tour render
+   [06] Tour render — llamado desde [12] Init global
    ============================================================ */
 function renderFechas() {
   var empty = qs('#tourEmpty');
@@ -455,6 +456,7 @@ function initFog() {
 /* ============================================================
    [11] Nav scroll infinito mobile + touch + mouse drag
    ============================================================ */
+
 function initNavScroll() {
   var track = document.querySelector('.nav-track');
   if (!track) return;
@@ -537,6 +539,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initFog();
   initShareButtons();
   initNavScroll();
+  renderFechas();
 
   // Visit counter
   var counterEl = document.getElementById('visitCounter');
