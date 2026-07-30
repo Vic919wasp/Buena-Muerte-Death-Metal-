@@ -526,8 +526,8 @@ body::before {
   margin-bottom: 1rem;
 }
 .tour-card__btn:hover { background: var(--rojo-sangre); color: var(--hueso); }
-.tour-card__btn--wa { border-color: #25d366; color: #25d366; }
-.tour-card__btn--wa:hover { background: #25d366; color: #fff; }
+.tour-card__btn--wa { background: #25d366; color: #fff; }
+.tour-card__btn--wa:hover { background: #1ebe5d; color: #fff; }
 .tour-card__fotos {
   display: flex;
   gap: .8rem;

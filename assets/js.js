@@ -3,7 +3,7 @@
              Nav mobile toggle, scroll-header shadow, active nav
              link en scroll, smooth-scroll con offset, uptime
              clock opcional, form handlers fake (newsletter/contact),
-             carga lazy de Spotify embeds y render de fechas FECHAS[].
+              carga lazy de Spotify embeds y soporte para compartir fechas.
    ============================================================
    ÍNDICE DE SECCIONES
    [01] Helpers               - línea 107
@@ -11,13 +11,13 @@
    [03] Nav / toggle mobile   - línea 122
    [04] Active link scroll    - línea 135
    [05] Smooth scroll anchor  - línea 162
-   [06] Tour render           - línea 183
+   [06] Tour legacy           - línea 141
    [07] Spotify lazy load     - línea 268
    [08] Newsletter form       - línea 292
     [09] Share buttons         - línea 368
     [10] Fog                   - línea 433
     [11] Nav scroll mobile     - línea 498
-    [12] Init global           - línea 530
+   [12] Init global           - línea 532
    ============================================================ */
 
 /* EDITAR acá para cargar fechas. Vacío = estado cero visible.
@@ -139,7 +139,7 @@ function initSmoothScroll() {
 }
 
 /* ============================================================
-   [06] Tour render — llamado desde [12] Init global
+   [06] Tour legacy — las cards oficiales ya vienen escritas en tour.html
    ============================================================ */
 function renderFechas() {
   var empty = qs('#tourEmpty');
@@ -539,7 +539,6 @@ document.addEventListener('DOMContentLoaded', function () {
   initFog();
   initShareButtons();
   initNavScroll();
-  renderFechas();
 
   // Visit counter
   var counterEl = document.getElementById('visitCounter');
