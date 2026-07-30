@@ -57,7 +57,7 @@ var FECHAS = [
     link: '#',
     mapa: 'https://maps.google.com/maps?q=EL+TEATRITO,+Sarmiento+1752,+C1042ABH+C1042ABH,+C1042ABH,+Cdad.+Autónoma+de+Buenos+Aires&output=embed',
     transporte: '98 - 150',
-    descripcion: 'Martes 27 de Octubre. Tocamos con Six Feet Under!!!!!. Terrible!!!. Anticipadas por whatsapp!!!!! Vamos que quedan pocas!!!. Nos vemos ahi!!!.',
+    descripcion: 'Martes 27 de Octubre. Tocamos con Six Feet Under!!!!!. Terrible!!!. Anticipadas por whatsapp!!!!! Vamos que quedan pocas!!!. Nos vemos ahi!!!!.',
     fotos: ['assets/tour/teatrito-sixel-feet.jpg']
   }
 ];
