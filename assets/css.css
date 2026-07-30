@@ -8,21 +8,20 @@
              Footer fijo con © y redes.
    ============================================================
    ÍNDICE DE SECCIONES
-   [01] VARIABLES / TOKENS     - línea 18
+   [01] VARIABLES / TOKENS     - línea 27
    [02] RESET / BASE           - línea 48
-   [03] HEADER / NAV           - línea 95
-   [04] HERO                   - línea 160
-   [05] SECCIONES / LAYOUT     - línea 210
-   [06] NEWS                   - línea 260
-   [07] TOUR                   - línea 300
-   [08] DISCOGRAPHY            - línea 340
-   [09] VIDEO                  - línea 380
-   [10] BAND / BIO             - línea 410
-   [11] NEWSLETTER             - línea 450
-   [12] CONTACT                - línea 480
-   [13] FOOTER                 - línea 520
-   [14] RESPONSIVE             - línea 570
-   [15] REDUCIR MOVIMIENTO     - línea 620
+   [03] HEADER / NAV           - línea 96
+   [04] HERO                   - línea 206
+   [05] SECCIONES / LAYOUT     - línea 284
+   [06] NEWS                   - línea 335
+   [07] TOUR                   - línea 443
+   [08] DISCOGRAPHY            - línea 643
+   [09] VIDEO                  - línea 692
+   [10] BAND / BIO             - línea 739
+   [12] CONTACT                - línea 869
+   [13] FOOTER                 - línea 899
+   [14] RESPONSIVE             - línea 939
+   [15] REDUCIR MOVIMIENTO     - línea 1003
    ============================================================ */
 
 /* [01] VARIABLES / TOKENS */
@@ -351,8 +350,12 @@ body::before {
 .news-item:hover { padding-left: .8rem; }
 .news-item__thumb {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  max-width: 320px;
+  max-height: 320px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
   border: 1px solid var(--linea);
   filter: grayscale(.25) contrast(1.05);
   transition: filter .3s, border-color .3s;
@@ -973,6 +976,7 @@ body::before {
   .tour-card__fotos img { max-width: 100%; }
   .tour-card__mapa iframe { height: 160px; }
   .news-item { grid-template-columns: 1fr; gap: 1rem; }
+  .news-item__thumb { max-width: min(100%, 320px); }
   .news-item__date { text-align: left; }
   .contact-grid { grid-template-columns: 1fr; }
   .hero { min-height: 70vh; padding: 4rem 1rem; }
