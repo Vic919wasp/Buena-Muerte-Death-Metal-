@@ -537,9 +537,10 @@ body::before {
 .tour-card__fotos a { flex: 1 1 100%; display: block; }
 .tour-card__fotos img {
   width: 100%;
-  max-width: 480px;
-  height: auto;
-  object-fit: contain;
+  height: 320px;
+  max-width: 100%;
+  object-fit: cover;
+  object-position: center top;
   border: 1px solid var(--linea);
   border-radius: 2px;
   filter: grayscale(.1);
