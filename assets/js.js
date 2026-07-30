@@ -40,15 +40,6 @@ var FECHAS = [
     fotos: ['assets/tour/IMG Cumple Macabro_3.jpeg']
   },
   {
-    dia: '24',
-    mes: 'JUL',
-    anio: '2026',
-    lugar: 'GIER MUSIC CLUB',
-    ciudad: 'CABA',
-    mapa: 'https://maps.google.com/maps?q=av.+alvarez+thomas+1078+CABA&output=embed',
-    fotos: ['assets/tour/Fecha Brutal death en Gier.jpeg']
-  },
-  {
     dia: '27',
     mes: 'OCT',
     anio: '2026',
@@ -59,6 +50,15 @@ var FECHAS = [
     transporte: '98 - 150',
     descripcion: 'Martes 27 de Octubre. Tocamos con Six Feet Under!!!!!. Terrible!!!. Anticipadas por whatsapp!!!!! Vamos que quedan pocas!!!. Nos vemos ahi!!!!.',
     fotos: ['assets/tour/teatrito-sixel-feet.jpg']
+  },
+  {
+    dia: '24',
+    mes: 'JUL',
+    anio: '2026',
+    lugar: 'GIER MUSIC CLUB',
+    ciudad: 'CABA',
+    mapa: 'https://maps.google.com/maps?q=av.+alvarez+thomas+1078+CABA&output=embed',
+    fotos: ['assets/tour/Fecha Brutal death en Gier.jpeg']
   }
 ];
 
