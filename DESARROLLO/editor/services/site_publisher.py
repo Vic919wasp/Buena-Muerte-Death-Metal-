@@ -10,7 +10,7 @@ import subprocess
 from datetime import datetime
 
 # [001] CONFIG
-SITE_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
+SITE_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "BM WEB"))
 
 
 def _run(cmd, cwd=SITE_ROOT):
@@ -36,8 +36,8 @@ def publish(message=None):
 
     steps = [
         ("git add -A", "Stage de archivos"),
-        f'git commit -m "{msg}"', "Commit",
-        "git push", "Push a Render",
+        (f'git commit -m "{msg}"', "Commit"),
+        ("git push", "Push a Render"),
     ]
 
     for cmd, desc in steps:

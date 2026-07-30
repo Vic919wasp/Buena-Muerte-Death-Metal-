@@ -6,17 +6,17 @@
              carga lazy de Spotify embeds y render de fechas FECHAS[].
    ============================================================
    ÍNDICE DE SECCIONES
-   [01] Helpers               - línea 27
-   [02] Datos editables       - línea 20
-   [03] Nav / toggle mobile   - línea 57
-   [04] Active link scroll    - línea 83
-   [05] Smooth scroll anchor  - línea 104
-   [06] Tour render           - línea 120
-   [07] Spotify lazy load     - línea 154
-   [08] Newsletter form       - línea 173
-   [09] Share buttons         - línea 217
-   [10] Fog                   - línea 291
-   [11] Nav scroll mobile     - línea 358
+   [01] Helpers               - línea 107
+   [02] Datos editables       - línea 114
+   [03] Nav / toggle mobile   - línea 122
+   [04] Active link scroll    - línea 135
+   [05] Smooth scroll anchor  - línea 162
+   [06] Tour render           - línea 183
+   [07] Spotify lazy load     - línea 268
+   [08] Newsletter form       - línea 292
+   [09] Share buttons         - línea 368
+   [10] Fog                   - línea 433
+   [11] Nav scroll mobile     - línea 498
    ============================================================ */
 
 /* EDITAR acá para cargar fechas. Vacío = estado cero visible.
@@ -27,6 +27,17 @@
 var WHATSAPP_CANTANTE = '5491164377706';
 var REDES_FOOTER = '\n\n🔗 *Seguinos en:*\n🌐 buena-muerte-death-metal.onrender.com\n🎵 open.spotify.com/intl-es/artist/5q9MTB7bYNx20VzAsYTblL\n🎬 youtube.com/results?search_query=buena+muerte+death+metal\n📸 instagram.com/buena.muerte';
 var FECHAS = [
+  {
+    dia: '08',
+    mes: 'AUG',
+    anio: '2026',
+    lugar: 'MELONIO BAR',
+    ciudad: 'CABA',
+    mapa: 'https://maps.google.com/maps?q=MONTEVIDEO+175+-+CONGRESO&output=embed',
+    transporte: '151 - 168 - 98 -60',
+    descripcion: '⛧⛧⛧Cumple Macabro ⛧⛧⛧ \nConmemorando el cumpleaños de Ramón Macabra Records!!!!\n⚰️Líder fundador de Dislepsia⚰️\nTOCAMOS: Dislepsia. Morferus. Uno  Mata. RIGOR MORTIS. BUENA MUERTE!!!!',
+    fotos: ['assets/tour/IMG Cumple Macabro_1.jpeg']
+  },
   {
     dia: '24',
     mes: 'JUL',
@@ -44,6 +55,7 @@ var FECHAS = [
     ciudad: 'CABA',
     link: '#',
     mapa: 'https://maps.google.com/maps?q=Sarmiento+1752+CABA&output=embed',
+    transporte: '1',
     descripcion: 'Martes 27 de Octubre. Tocamos con Six Feet Under!!!!. Terrible!!!. Anticipadas por whatsapp!!!!! Vamos que quedan pocas!!!. Nos vemos ahi!!!.',
     fotos: ['assets/tour/teatrito-sixel-feet.jpg']
   }
@@ -137,12 +149,12 @@ function renderFechas() {
   empty.style.display = 'none';
   container.style.display = 'block';
   if (head) { head.textContent = FECHAS.length + ' fecha' + (FECHAS.length === 1 ? '' : 's') + ' confirmada' + (FECHAS.length === 1 ? '' : 's'); }
-  container.innerHTML = FECHAS.map(function (f, i) {
+  container.innerHTML = FECHAS.map(function (f) {
     var cta = '';
     if (f.link && f.link !== '#') {
       cta = '<a href="' + f.link + '" target="_blank" rel="noopener" class="tour-card__btn">ENTRADAS ›</a>';
     } else {
-      var waUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent('Hola Favio!, quiero entradas para el show de ' + f.lugar + ' ' + f.dia + '/' + f.mes + '/' + f.anio + '!!!' + REDES_FOOTER);
+      var waUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent('Hola Favio!, quiero entradas para el show de ' + f.lugar + ' ' + f.dia + '/' + f.mes + '/' + f.anio + '!!!');
       cta = '<a href="' + waUrl + '" target="_blank" rel="noopener" class="tour-card__btn tour-card__btn--wa">CONSULTAR POR WHATSAPP ›</a>';
     }
     var fotos = '';
@@ -165,125 +177,49 @@ function renderFechas() {
     }
     var shareText = '🎵 *' + f.lugar + '*\n' +
       '📍 ' + (f.ciudad || '') + '\n' +
-      f.dia + ' ' + f.mes + ' ' + f.anio + '\n' +
-      (f.descripcion ? '\n' + f.descripcion + '\n' : '') +
+      '📅 ' + f.dia + '/' + f.mes + '/' + f.anio + '\n' +
+      (f.descripcion ? '\n📝 ' + f.descripcion + '\n' : '') +
       (f.transporte ? '\n🚌 ' + f.transporte + '\n' : '') +
       (f.mapa ? '\n🗺️ Ver ubicación: ' + mapaLink + '\n' : '') +
-      '\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE + REDES_FOOTER;
-    var shareUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(shareText);
-    var share = '<a href="#" class="tour-card__btn tour-card__btn--wa" onclick="shareFecha(event, ' + i + ')">COMPARTIR FECHA ›</a>';
-    var desc = '';
-    if (f.descripcion) {
-      desc = '<div class="tour-card__desc">' + f.descripcion + '</div>';
-    }
+      '\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE;
+    var shareUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText);
+    var shareId = 'share_' + f.dia + '_' + (f.mes || '').replace(/\W/g, '');
+    var share = '<button class="tour-card__btn tour-card__btn--share" onclick="shareFecha(\'' + shareId + '\')">COMPARTIR FECHA ›</button>' +
+      '<input type="hidden" id="' + shareId + '_url" value="' + (f.fotos && f.fotos.length ? location.origin + '/' + f.fotos[0] : '') + '">' +
+      '<input type="hidden" id="' + shareId + '_text" value="' + encodeURIComponent(shareText) + '">' +
+      '<input type="hidden" id="' + shareId + '_wa" value="' + shareUrl + '">';
     return '<div class="tour-card">' +
       '<div class="tour-card__fecha"><b>' + f.dia + '</b><br><span>' + (f.mes || '') + ' ' + (f.anio || '') + '</span></div>' +
       '<div class="tour-card__info">' +
         '<div class="tour-card__lugar">' + f.lugar + '<span>' + (f.ciudad || '') + '</span></div>' +
-        desc + cta + share + fotos + mapa + transporte +
+        cta + share + fotos + mapa + transporte +
       '</div>' +
     '</div>';
   }).join('');
 }
 
-/* Generar flyer compuesto: foto + barra de texto al pie + mapa */
-function generarFlyer(imageUrl, info, mapaUrl) {
-  var W = 1080, H = Math.round(W * 1.35);
-  var BAR_H = Math.round(H * 0.30);
-  var canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  var ctx = canvas.getContext('2d');
-  return new Promise(function (resolve, reject) {
-    var img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function () {
-      var imgR = img.width / img.height, canR = W / H;
-      var sx, sy, sw, sh;
-      if (imgR > canR) { sh = img.height; sw = sh * canR; sx = (img.width - sw) / 2; sy = 0; }
-      else { sw = img.width; sh = sw / canR; sx = 0; sy = (img.height - sh) / 2; }
-      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
-      ctx.fillStyle = 'rgba(0,0,0,0.75)';
-      ctx.fillRect(0, H - BAR_H, W, BAR_H);
-      ctx.fillStyle = '#fff';
-      ctx.textAlign = 'center';
-      var y = H - BAR_H + Math.round(H * 0.035);
-      var s1 = Math.round(W * 0.07);
-      ctx.font = 'bold ' + s1 + 'px sans-serif';
-      ctx.fillText(info.lugar, W / 2, y += s1);
-      var s2 = Math.round(W * 0.048);
-      ctx.font = s2 + 'px sans-serif';
-      ctx.fillText(info.ciudad || '', W / 2, y += s2 * 1.5);
-      ctx.font = 'bold ' + s2 + 'px sans-serif';
-      ctx.fillText(info.dia + ' ' + info.mes + ' ' + info.anio, W / 2, y += s2 * 1.5);
-      if (info.transporte) {
-        var s3 = Math.round(W * 0.036);
-        ctx.font = s3 + 'px sans-serif';
-        ctx.fillStyle = '#bbb';
-        ctx.fillText('🚌 ' + info.transporte, W / 2, y += s2 * 1.4);
-      }
-      if (mapaUrl) {
-        var s4 = Math.round(W * 0.032);
-        ctx.font = s4 + 'px sans-serif';
-        ctx.fillStyle = '#9cf';
-        ctx.fillText('🗺️ ' + mapaUrl, W / 2, y += s2 * 1.3);
-      }
-      ctx.fillStyle = '#ccc';
-      var s5 = Math.round(W * 0.032);
-      ctx.font = s5 + 'px sans-serif';
-      ctx.fillText('🎫 Entradas / Info: wa.me/' + WHATSAPP_CANTANTE, W / 2, y += s2 * 1.4);
-      var s6 = Math.round(W * 0.024);
-      ctx.font = s6 + 'px sans-serif';
-      ctx.fillStyle = '#aaa';
-      ctx.fillText('buena-muerte-death-metal.onrender.com · @buena.muerte', W / 2, y += s2 * 1.2);
-      canvas.toBlob(function (blob) {
-        if (!blob) { reject(new Error('toBlob failed')); return; }
-        resolve(new File([blob], 'flyer-' + info.dia + info.mes + '.jpg', { type: 'image/jpeg' }));
-      }, 'image/jpeg', 0.92);
-    };
-    img.onerror = function () { reject(new Error('image failed')); };
-    img.src = imageUrl;
-  });
-}
-
-/* Compartir fecha: flyer compuesto + mapa */
-function shareFecha(e, idx) {
-  e.preventDefault();
-  var f = FECHAS[idx];
-  if (!f) return;
-  var imgUrl = (f.fotos && f.fotos.length) ? f.fotos[0] : '';
-  var mapaLink = f.mapa ? f.mapa.replace(/&output=embed/, '').replace(/output=embed&?/, '') : '';
-  var msgText = '🎵 *' + f.lugar + '*\n📍 ' + (f.ciudad || '') + '\n' + f.dia + ' ' + f.mes + ' ' + f.anio +
-    (f.descripcion ? '\n' + f.descripcion : '') +
-    (f.transporte ? '\n🚌 ' + f.transporte : '') +
-    (mapaLink ? '\n🗺️ Ver ubicación: ' + mapaLink : '') +
-    '\n\n🎫 Entradas / Info:\nhttps://wa.me/' + WHATSAPP_CANTANTE + REDES_FOOTER;
-  var waUrl = 'https://wa.me/' + WHATSAPP_CANTANTE + '?text=' + encodeURIComponent(msgText);
-
-  if (!imgUrl) {
-    location.href = waUrl;
-    return;
+/* Compartir fecha con imagen real (Web Share API en celular) */
+function shareFecha(id) {
+  var imgUrl = document.getElementById(id + '_url').value;
+  var text = decodeURIComponent(document.getElementById(id + '_text').value);
+  var waUrl = document.getElementById(id + '_wa').value;
+  if (navigator.share && navigator.canShare && imgUrl) {
+    fetch(imgUrl).then(function (r) { return r.blob(); }).then(function (blob) {
+      var ext = imgUrl.split('.').pop().toLowerCase();
+      var type = ext === 'png' ? 'image/png' : 'image/jpeg';
+      var file = new File([blob], 'flyer.jpg', { type: type });
+      var data = { text: text };
+      if (navigator.canShare({ files: [file] })) { data.files = [file]; }
+      return navigator.share(data);
+    }).catch(function () {
+      if (imgUrl) { window.open(imgUrl, '_blank'); }
+    });
+  } else if (imgUrl) {
+    window.open(imgUrl, '_blank');
+    setTimeout(function () { window.open(waUrl, '_blank'); }, 500);
+  } else {
+    window.open(waUrl, '_blank');
   }
-
-  var info = { lugar: f.lugar, ciudad: f.ciudad, dia: f.dia, mes: f.mes, anio: f.anio, transporte: f.transporte || '' };
-
-  generarFlyer(imgUrl, info, mapaLink).then(function (file) {
-    if (navigator.share && navigator.canShare) {
-      var data = { files: [file], text: msgText };
-      if (navigator.canShare(data)) {
-        return navigator.share(data).then(function () {}).catch(function () {});
-      }
-    }
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(file);
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    location.href = waUrl;
-  }).catch(function () {
-    location.href = waUrl;
-  });
 }
 
 /* ============================================================
@@ -452,7 +388,7 @@ function initVideoInline() {
 }
 
 /* ============================================================
-   [09] Fog — niebla borravino sutil cubriendo ~35% del sitio
+   [10] Fog — niebla borravino sutil cubriendo ~35% del sitio
    ============================================================ */
 function initFog() {
   var canvas = document.getElementById('sparkles');
@@ -595,7 +531,6 @@ document.addEventListener('DOMContentLoaded', function () {
   initNav();
   initActiveLink();
   initSmoothScroll();
-  renderFechas();
   initSpotifyLazy();
   initNewsletter();
   initVideoInline();

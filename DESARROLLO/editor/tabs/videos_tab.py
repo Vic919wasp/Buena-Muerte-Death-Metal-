@@ -15,8 +15,9 @@ from services.html_generator import get_videos, save_videos
 
 
 class VideosTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, refresh_callback=None, parent=None):
         super().__init__(parent)
+        self._refresh_callback = refresh_callback
         self._setup_ui()
         self.load_data()
 
@@ -88,6 +89,8 @@ class VideosTab(QWidget):
         self.id_input.clear()
         self.title_input.clear()
         self.load_data()
+        if self._refresh_callback:
+            self._refresh_callback()
 
     def _delete(self, row):
         confirm = QMessageBox.question(
@@ -97,7 +100,11 @@ class VideosTab(QWidget):
             self.videos.pop(row)
             save_videos(self.videos)
             self.load_data()
+            if self._refresh_callback:
+                self._refresh_callback()
 
     def _save(self):
         save_videos(self.videos)
         QMessageBox.information(self, "Guardado", "Videos guardados correctamente.")
+        if self._refresh_callback:
+            self._refresh_callback()

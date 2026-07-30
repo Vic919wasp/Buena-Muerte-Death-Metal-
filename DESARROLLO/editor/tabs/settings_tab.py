@@ -6,18 +6,22 @@ CONTEXTO: Pestaña de configuración y publicación. Permite configurar
 [002] UI                    - línea 25
 [003] ACCIONES              - línea 70
 """
+import json
+import os
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
-    QTextEdit, QLineEdit, QMessageBox,
+    QTextEdit, QLineEdit, QMessageBox, QComboBox, QFrame,
 )
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont
 from services import site_publisher
 
 
 # [001] IMPORTS / CLASE
 class SettingsTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, refresh_callback=None, parent=None):
         super().__init__(parent)
+        self._refresh_callback = refresh_callback
         self._setup_ui()
         self._refresh_status()
 
@@ -29,6 +33,20 @@ class SettingsTab(QWidget):
         header = QLabel("Configuración y Publicación")
         header.setStyleSheet("font-family:'Cinzel',serif; font-size:18px; color:#c8ccd0;")
         layout.addWidget(header)
+
+        theme_label = QLabel("Tema:")
+        theme_label.setStyleSheet("color:#9aa0a6;")
+        layout.addWidget(theme_label)
+
+        self.theme_combo = QComboBox()
+        self._populate_themes()
+        self.theme_combo.currentTextChanged.connect(self._apply_theme)
+        layout.addWidget(self.theme_combo)
+
+        sep = QFrame()
+        sep.setFrameShape(QFrame.HLine)
+        sep.setStyleSheet("color:#1f2225;")
+        layout.addWidget(sep)
 
         status_label = QLabel("Estado del repositorio:")
         status_label.setStyleSheet("color:#9aa0a6;")
@@ -69,6 +87,41 @@ class SettingsTab(QWidget):
         layout.addWidget(self.log_text)
 
     # [003] ACCIONES
+    def _populate_themes(self):
+        themes_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "themes.json"
+        )
+        if os.path.exists(themes_path):
+            with open(themes_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            active = data.get("active", "dark_amber")
+            for key, t in data.get("themes", {}).items():
+                label = t.get("label", key)
+                self.theme_combo.addItem(label, key)
+                if key == active:
+                    idx = self.theme_combo.count() - 1
+                    self.theme_combo.setCurrentIndex(idx)
+
+    def _apply_theme(self, text):
+        theme_name = self.theme_combo.currentData()
+        if not theme_name:
+            return
+        themes_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "themes.json"
+        )
+        if os.path.exists(themes_path):
+            with open(themes_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            data["active"] = theme_name
+            with open(themes_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+            QMessageBox.information(
+                self, "Tema",
+                "Tema guardado. Reiniciá el editor para aplicarlo."
+            )
+
     def _refresh_status(self):
         status = site_publisher.get_status()
         if "error" in status:
@@ -119,3 +172,5 @@ class SettingsTab(QWidget):
         else:
             QMessageBox.critical(self, "Error", text)
         self._refresh_status()
+        if ok and self._refresh_callback:
+            self._refresh_callback()

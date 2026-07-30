@@ -18,8 +18,9 @@ from services import api_client
 
 # [001] IMPORTS / CLASE
 class NewsletterTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, refresh_callback=None, parent=None):
         super().__init__(parent)
+        self._refresh_callback = refresh_callback
         self.subscribers = []
         self._setup_ui()
         self.load_data()

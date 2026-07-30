@@ -23,8 +23,9 @@ GALLERY_DIR = os.path.join(SITE_ROOT, "assets", "posts")
 
 
 class BandTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, refresh_callback=None, parent=None):
         super().__init__(parent)
+        self._refresh_callback = refresh_callback
         os.makedirs(GALLERY_DIR, exist_ok=True)
         self._setup_ui()
         self.load_data()
@@ -195,6 +196,8 @@ class BandTab(QWidget):
             flags=re.DOTALL,
         )
         _write("band.html", new_html)
+        if self._refresh_callback:
+            self._refresh_callback()
 
     def _add_gallery(self):
         files, _ = QFileDialog.getOpenFileNames(
@@ -226,6 +229,8 @@ class BandTab(QWidget):
             )
         _write("band.html", html)
         self.load_data()
+        if self._refresh_callback:
+            self._refresh_callback()
 
     def _del_gallery(self, row):
         confirm = QMessageBox.question(
@@ -240,6 +245,8 @@ class BandTab(QWidget):
             )
             _write("band.html", html)
             self.load_data()
+            if self._refresh_callback:
+                self._refresh_callback()
 
     def _save_bio(self):
         new_bio = self.bio_edit.toPlainText().strip()
@@ -254,3 +261,5 @@ class BandTab(QWidget):
         )
         _write("band.html", new_html)
         QMessageBox.information(self, "Guardado", "Biografía guardada correctamente.")
+        if self._refresh_callback:
+            self._refresh_callback()

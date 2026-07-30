@@ -16,8 +16,9 @@ import re
 
 
 class ContactTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, refresh_callback=None, parent=None):
         super().__init__(parent)
+        self._refresh_callback = refresh_callback
         self._setup_ui()
         self.load_data()
 
@@ -102,3 +103,5 @@ class ContactTab(QWidget):
                 _write(fname, content)
 
         QMessageBox.information(self, "Guardado", "Contacto y redes guardados.")
+        if self._refresh_callback:
+            self._refresh_callback()

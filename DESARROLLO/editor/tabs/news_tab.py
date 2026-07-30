@@ -16,8 +16,9 @@ from services.html_generator import get_news, save_news
 
 # [001] IMPORTS / CLASE
 class NewsTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, refresh_callback=None, parent=None):
         super().__init__(parent)
+        self._refresh_callback = refresh_callback
         self._setup_ui()
         self.load_data()
 
@@ -118,6 +119,8 @@ class NewsTab(QWidget):
         save_news(self.articles)
         self._clear_form()
         self.load_data()
+        if self._refresh_callback:
+            self._refresh_callback()
 
     def _delete(self, row):
         confirm = QMessageBox.question(
@@ -127,10 +130,14 @@ class NewsTab(QWidget):
             self.articles.pop(row)
             save_news(self.articles)
             self.load_data()
+            if self._refresh_callback:
+                self._refresh_callback()
 
     def _save(self):
         save_news(self.articles)
         QMessageBox.information(self, "Guardado", "Noticias guardadas correctamente.")
+        if self._refresh_callback:
+            self._refresh_callback()
 
     def _clear_form(self):
         self.title_input.clear()

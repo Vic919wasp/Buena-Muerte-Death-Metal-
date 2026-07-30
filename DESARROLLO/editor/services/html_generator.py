@@ -3,16 +3,18 @@ CONTEXTO: Generador de HTML para el sitio Buena Muerte. Lee y escribe
           los archivos HTML/JS del sitio para mantenerlos sincronizados.
 ÍNDICE DE NAVEGACIÓN
 [001] CONFIG / RUTAS        - línea 12
-[002] TOUR — FECHAS[]       - línea 20
-[003] NEWS — news.html      - línea 55
-[004] BAND — band.html      - línea 110
+[002] TOUR — FECHAS[]       - línea 45
+[003] NEWS — news.html      - línea 197
+[004] BAND — band.html      - línea 244
 """
 import os
 import re
+import urllib.parse
 from datetime import datetime
 
 # [001] CONFIG / RUTAS
-SITE_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
+SITE_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "BM WEB"))
+WHATSAPP_CANTANTE = "5491164377706"  # usado en _gen_card_html()
 
 
 def _read(rel_path):
@@ -30,50 +32,190 @@ def _write(rel_path, content):
         f.write(content)
 
 
+def _js_escape(val):
+    """Escapa un valor para usarlo dentro de una cadena con comilla simple en JS."""
+    val = val.replace('\\', '\\\\')
+    val = val.replace("'", "\\'")
+    val = val.replace('\n', '\\n')
+    val = val.replace('\r', '\\r')
+    val = val.replace('\t', '\\t')
+    return val
+
+
 # [002] TOUR — FECHAS[]
 def get_fechas():
     js = _read("assets/js.js")
-    match = re.search(r"var FECHAS\s*=\s*\[(.*?)\];", js, re.DOTALL)
+    match = re.search(r"var FECHAS\s*=\s*\[(.*?)\]\s*;", js, re.DOTALL)
     if not match:
         return []
     block = match.group(1).strip()
     if not block:
         return []
     fechas = []
-    for obj_match in re.finditer(r"\{(.*?)\}", block, re.DOTALL):
+    obj_re = re.compile(r"\{(.*?)\}", re.DOTALL)
+    kv_re = re.compile(r"(\w+)\s*:\s*'(?:[^'\\]|\\.)*'", re.DOTALL)
+    foto_list_re = re.compile(r"fotos\s*:\s*\[(.*?)\]", re.DOTALL)
+    foto_url_re = re.compile(r"'(?:[^'\\]|\\.)*'", re.DOTALL)
+    for obj_match in obj_re.finditer(block):
         obj_str = obj_match.group(1)
         fecha = {}
-        for kv in re.finditer(r"(\w+)\s*:\s*['\"]([^'\"]*)['\"]", obj_str):
-            fecha[kv.group(1)] = kv.group(2)
-        arr_match = re.search(r"fotos\s*:\s*\[(.*?)\]", obj_str, re.DOTALL)
+        for kv in kv_re.finditer(obj_str):
+            key = kv.group(1)
+            raw = kv.group(0)
+            inner = raw[raw.index("'") + 1 : raw.rindex("'")]
+            inner = inner.replace("\\\\", "\\").replace("\\'", "'").replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t")
+            fecha[key] = inner
+        arr_match = foto_list_re.search(obj_str)
         if arr_match:
-            urls = re.findall(r"['\"]([^'\"]+)['\"]", arr_match.group(1))
+            urls = []
+            for m in foto_url_re.finditer(arr_match.group(1)):
+                u = m.group(0)
+                u_inner = u[1:-1]
+                u_inner = u_inner.replace("\\\\", "\\").replace("\\'", "'")
+                urls.append(u_inner)
             fecha["fotos"] = urls
-        if fecha:
+        if fecha and fecha.get("dia"):
             fechas.append(fecha)
     return fechas
 
 
+def _gen_card_html(f):
+    """Genera el HTML de un tour-card desde un dict FECHAS."""
+    wa_url = (
+        "https://wa.me/" + WHATSAPP_CANTANTE
+        + "?text=" + urllib.parse.quote(
+            f'Hola Favio!, quiero entradas para el show de {f.get("lugar","")} '
+            f'{f.get("dia","")}/{f.get("mes","")}/{f.get("anio","")}!!!'
+        )
+    )
+    if f.get("link") and f["link"] != "#":
+        cta = f'<a href="{f["link"]}" target="_blank" rel="noopener" class="tour-card__btn">ENTRADAS ›</a>'
+    else:
+        cta = f'<a href="{wa_url}" target="_blank" rel="noopener" class="tour-card__btn tour-card__btn--wa">CONSULTAR POR WHATSAPP ›</a>'
+
+    share_text = (
+        f'🎵 *{f.get("lugar","")}*\n'
+        f'📍 {f.get("ciudad","")}\n'
+        f'📅 {f.get("dia","")}/{f.get("mes","")}/{f.get("anio","")}\n'
+        + (f'\n📝 {f["descripcion"]}\n' if f.get("descripcion") else "")
+        + (f'\n🚌 {f["transporte"]}\n' if f.get("transporte") else "")
+        + (f'\n🗺️ Ver ubicación: {f["mapa"]}\n' if f.get("mapa") else "")
+        + f'\n🎫 Entradas / Info:\nhttps://wa.me/{WHATSAPP_CANTANTE}'
+    )
+    share_url = "https://api.whatsapp.com/send?text=" + urllib.parse.quote(share_text)
+    sid = f'share_{f.get("dia","")}_{(f.get("mes","") or "").replace(chr(92)+"W","")}'
+    share = (
+        f'<button class="tour-card__btn tour-card__btn--share" onclick="shareFecha(\'{sid}\')">COMPARTIR FECHA ›</button>'
+        + f'<input type="hidden" id="{sid}_url" value="{(f.get("fotos") or [""])[0] if f.get("fotos") else ""}">'
+        + f'<input type="hidden" id="{sid}_text" value="{urllib.parse.quote(share_text)}">'
+        + f'<input type="hidden" id="{sid}_wa" value="{share_url}">'
+    )
+
+    fotos = ""
+    if f.get("fotos"):
+        fotos = '<div class="tour-card__fotos">' + "".join(
+            f'<a href="{url}" target="_blank" rel="noopener"><img src="{url}" loading="lazy" alt="Promo {f.get("lugar","")}"></a>'
+            for url in f["fotos"]
+        ) + "</div>"
+
+    mapa = ""
+    if f.get("mapa"):
+        mapa_link = f["mapa"].replace("&output=embed", "").replace("output=embed&?", "")
+        mapa = (
+            f'<div class="tour-card__mapa">'
+            f'<iframe src="{f["mapa"]}" loading="lazy" allowfullscreen title="Ubicación de {f.get("lugar","")}"></iframe>'
+            f'<a href="{mapa_link}" target="_blank" rel="noopener" class="tour-card__mapa-link">Abrir en Google Maps ↗</a>'
+            f"</div>"
+        )
+
+    transporte = ""
+    if f.get("transporte"):
+        transporte = f'<div class="tour-card__transporte">Cómo llegar: {f["transporte"]}</div>'
+
+    return (
+        f'        <div class="tour-card">\n'
+        f'          <div class="tour-card__fecha"><b>{f.get("dia","")}</b><br><span>{f.get("mes","")} {f.get("anio","")}</span></div>\n'
+        f'          <div class="tour-card__info">\n'
+        f'            <div class="tour-card__lugar">{f.get("lugar","")}<span>{f.get("ciudad","")}</span></div>\n'
+        f"            {cta}\n"
+        f"            {share}\n"
+        f"            {fotos}\n"
+        f"            {mapa}\n"
+        f"            {transporte}\n"
+        f"          </div>\n"
+        f"        </div>"
+    )
+
+
 def save_fechas(fechas):
+    fechas = [f for f in fechas if f.get("dia")]
     js = _read("assets/js.js")
     lines = []
     for i, f in enumerate(fechas):
         parts = []
         for k in ["dia", "mes", "anio", "lugar", "ciudad", "link", "mapa", "transporte", "descripcion"]:
             if k in f and f[k]:
-                parts.append(f"    {k}: '{f[k]}'")
+                parts.append(f"    {k}: '{_js_escape(f[k])}'")
         if f.get("fotos"):
-            fotos_str = ", ".join(f"'{url}'" for url in f["fotos"])
+            fotos_str = ", ".join(f"'{_js_escape(url)}'" for url in f["fotos"])
             parts.append(f"    fotos: [{fotos_str}]")
         lines.append("  {\n" + ",\n".join(parts) + "\n  }" + ("," if i < len(fechas) - 1 else ""))
     block = "\n".join(lines)
-    new_js = re.sub(
-        r"var FECHAS\s*=\s*\[.*?\];",
-        f"var FECHAS = [\n{block}\n];",
-        js,
-        flags=re.DOTALL,
-    )
+    fechas_match = re.search(r"var FECHAS\s*=\s*\[.*?\]\s*;", js, re.DOTALL)
+    if not fechas_match:
+        raise ValueError("No se encontró var FECHAS en assets/js.js")
+    new_js = js[:fechas_match.start()] + f"var FECHAS = [\n{block}\n];" + js[fechas_match.end():]
     _write("assets/js.js", new_js)
+
+    # --- También escribir cards en tour.html (como videos) ---
+    html = _read("tour.html")
+    # Buscar el contenedor de cards; la referencia es <aside class="tour-sidebar">
+    # (puede haber un comentario HTML antes)
+    m = re.search(
+        r'(<div class="tour-cards" id="tourTable"[^>]*>).*?(</div>\s*</div>\s*(?:<!--.*?-->)?\s*\n?\s*<aside)',
+        html,
+        re.DOTALL,
+    )
+    if not m:
+        raise ValueError("No se encontró #tourTable en tour.html")
+    if fechas:
+        cards_html = "\n\n".join(_gen_card_html(f) for f in fechas)
+        new_html = html[: m.end(1)] + "\n" + cards_html + "\n        " + html[m.start(2) :]
+        new_html = re.sub(
+            r'<div class="tour-cards" id="tourTable"[^>]*>',
+            '<div class="tour-cards" id="tourTable" style="display:block">',
+            new_html,
+            count=1,
+        )
+        new_html = re.sub(
+            r'id="tourEmpty"(?:\s+style="display:none")*',
+            'id="tourEmpty" style="display:none"',
+            new_html,
+        )
+        cantidad = len(fechas)
+        titulo = f"{cantidad} fecha{'s' if cantidad != 1 else ''} confirmada{'s' if cantidad != 1 else ''}"
+        new_html = re.sub(
+            r'(<h2 id="tourHeader"[^>]*>).*?(</h2>)',
+            rf'\g<1>{titulo}\g<2>',
+            new_html,
+            count=1,
+        )
+    else:
+        new_html = html[: m.end(1)] + "\n        " + html[m.start(2) :]
+        new_html = re.sub(
+            r'<div class="tour-cards" id="tourTable"[^>]*>',
+            '<div class="tour-cards" id="tourTable">',
+            new_html,
+            count=1,
+        )
+        new_html = new_html.replace('id="tourEmpty" style="display:none"', 'id="tourEmpty"')
+        new_html = re.sub(
+            r'(<h2 id="tourHeader"[^>]*>).*?(</h2>)',
+            r'\1Sin señal por ahora\2',
+            new_html,
+            count=1,
+        )
+    _write("tour.html", new_html)
 
 
 # [003] NEWS — news.html

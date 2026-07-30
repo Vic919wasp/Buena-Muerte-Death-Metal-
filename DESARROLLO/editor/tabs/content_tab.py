@@ -19,9 +19,21 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QThread, Signal
 
-from services import ai_service
+try:
+    from services import ai_service
+    _HAS_AI = True
+except ImportError:
+    ai_service = None
+    _HAS_AI = False
+
 from services import content_scraper
-from services import news_generator
+try:
+    from services import news_generator
+    _HAS_NEWS_GEN = True
+except ImportError:
+    news_generator = None
+    _HAS_NEWS_GEN = False
+
 from services import html_generator
 
 ARTICLES_FILE = os.path.join(os.path.dirname(__file__), "..", "articles.json")
@@ -70,8 +82,9 @@ class SearchWorker(QThread):
 
 # [002] UI / LAYOUT
 class ContentPipelineTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, refresh_callback=None, parent=None):
         super().__init__(parent)
+        self._refresh_callback = refresh_callback
         self._scraped = None
         self._article = None
         self._worker = None

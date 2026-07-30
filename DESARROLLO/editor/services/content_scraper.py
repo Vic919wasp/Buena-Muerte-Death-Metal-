@@ -320,7 +320,7 @@ def batch_scrape(urls: list) -> list:
 
 
 def fetch_member_info(band_name: str, role: str) -> dict:
-    """Busca info específica de un integrante por rol."""
+    """Busca info específica de un integrante por rol — búsqueda periodística."""
     results = {"texts": [], "images": [], "sources": []}
     blocked = ["metal-archives.com", "twitter.com", "x.com"]
 
@@ -330,15 +330,22 @@ def fetch_member_info(band_name: str, role: str) -> dict:
         results["texts"].append(f"[Sitio oficial]\n{site['text']}")
         results["sources"].append(site_url)
 
+    # Búsquedas periodísticas específicas
     queries = [
         f'"{band_name}" {role}',
-        f'{band_name} {role} nombre',
-        f'"{band_name}" {role} biografia',
-        f'"{band_name}" {role} Argentina metal',
-        f'{band_name} banda {role} who is',
-        f'"{band_name}" {role} instagram',
-        f'"{band_name}" {role} entrevista interview',
-        f'"{band_name}" members lineup',
+        f'{band_name} {role} nombre real',
+        f'"{band_name}" {role} biografía entrevista',
+        f'"{band_name}" {role} Argentina metal concierto',
+        f'{band_name} banda {role} who is biography',
+        f'"{band_name}" {role} instagram facebook perfil',
+        f'"{band_name}" {role} entrevista interview review',
+        f'"{band_name}" members lineup integrantes',
+        f'"{band_name}" {role} previous band ex',
+        f'"{band_name}" {role} discography albums',
+        f'"{band_name}" {role} influences style',
+        f'"{band_name}" {role} live show performance',
+        f'"{band_name}" festival recital Argentina 2024 2025',
+        f'"{band_name}" prensa nota periodística',
     ]
     for q in queries:
         search_results = search_web(q, num_results=5)
@@ -358,10 +365,15 @@ def fetch_member_info(band_name: str, role: str) -> dict:
     consolidated = "\n\n---\n\n".join(results["texts"])
     if not consolidated.strip() or len(consolidated) < 200:
         consolidated = (
-            f"La búsqueda web sobre el {role} de {band_name} no arrojó resultados "
+            f"La búsqueda web sobre el/la {role} de {band_name} no arrojó resultados "
             f"suficientes. Esto puede deberse a que la banda es underground y no "
             f"tiene presencia pública documentada de sus integrantes. "
-            f"Se encontró info del sitio oficial pero sin datos específicos del {role}."
+            f"Se encontró info del sitio oficial pero sin datos específicos del {role}.\n\n"
+            f"RECOMENDACIÓN PERIODÍSTICA: Para obtener info confiable, se sugeriría:\n"
+            f"- Contactar directamente a la banda por WhatsApp (5491164377706)\n"
+            f"- Revisar perfiles de Instagram/Facebook de los integrantes\n"
+            f"- Buscar en bases de datos de metal argentino (SAMetalIndex, Metalpedia)\n"
+            f"- Revisar reseñas de shows en Madhouse, Icarus Music, Del Otro Lado"
         )
     return {
         "text": consolidated[:10000],

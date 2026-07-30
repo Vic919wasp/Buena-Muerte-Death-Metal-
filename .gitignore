@@ -7,3 +7,7 @@ venv/
 *.pyc
 .DS_Store
 Thumbs.db
+Backups/
+ENTREGABLE/
+editor_config.json
+**/editor_config.json
