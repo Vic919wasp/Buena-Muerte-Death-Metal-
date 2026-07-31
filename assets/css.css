@@ -595,11 +595,47 @@ body::before {
   margin-bottom: .5rem;
 }
 
-/* [07b] TOUR LAYOUT — 2 columns */
+/* [07b] TOUR LAYOUT — 2 columns (contenido + aside) */
 .tour-layout { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: start; }
 .tour-layout .tour-wrap { max-width: none; }
 
-/* [07c] INSTAGRAM SIDEBAR */
+/* [07c] ASIDE derecho: agrupa Macabra + Icarus en una sola columna del grid.
+   Al haber un solo .tour-aside como 2° hijo, no se genera una 3° fila en el grid
+   y los dos bloques fluyen en columna normal. */
+.tour-aside { display: flex; flex-direction: column; gap: 2rem; min-width: 0; }
+.tour-aside .tour-sidebar__macabra,
+.tour-aside .tour-sidebar__icarus { min-width: 0; }
+
+/* Macabra: card de Facebook, sin sticky */
+.tour-sidebar__macabra { background: var(--negro-2); border: 1px solid var(--linea); border-radius: 6px; padding: 1.2rem; }
+.tour-sidebar__macabra .tour-sidebar__fb { background: var(--negro-1); border-radius: 4px; overflow: hidden; }
+.tour-sidebar__macabra .tour-sidebar__fb iframe { display: block; border: 0; }
+
+/* Icarus: card informativa, sin sticky */
+.tour-sidebar__icarus { background: var(--negro-2); border: 1px solid var(--linea); border-radius: 6px; padding: 1.2rem; }
+.tour-sidebar__icarus .icarus-info { padding: 0; }
+.tour-sidebar__icarus .icarus-info__label { font-family: var(--fuente-sans); font-size: .55rem; letter-spacing: .22em; text-transform: uppercase; color: var(--bronce-claro); margin: 1rem 0; }
+.tour-sidebar__icarus .icarus-info__detail { font-family: var(--fuente-serif); font-size: .9rem; color: var(--plata-viva); line-height: 1.5; margin-bottom: 1rem; }
+.tour-sidebar__icarus .icarus-info__compilation { border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea); padding: 1rem 0; margin-bottom: 1rem; }
+.tour-sidebar__icarus .icarus-info__tag { display: inline-block; font-family: var(--fuente-sans); font-size: .5rem; letter-spacing: .2em; text-transform: uppercase; color: var(--negro-1); background: var(--rojo-vivo); padding: .2rem .7rem; border-radius: 2px; margin-bottom: .5rem; }
+.tour-sidebar__icarus .icarus-info__compilation p { font-family: var(--fuente-serif); font-size: .85rem; color: var(--hueso); margin-bottom: .2rem; }
+.tour-sidebar__icarus .icarus-info__track { color: var(--bronce); font-style: italic; }
+.tour-sidebar__icarus .icarus-info__about { font-family: var(--fuente-serif); font-size: .8rem; color: var(--bronce-claro); line-height: 1.5; font-style: italic; }
+
+.tour-sidebar__title {
+  font-family: var(--fuente-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--hueso);
+  margin-bottom: 1rem;
+  padding-bottom: .6rem;
+  border-bottom: 1px solid var(--linea);
+}
+.tour-sidebar__btn { width: 100%; text-align: center; margin-top: 1rem; }
+
+/* [07d] TOUR SIDEBAR sticky (uso opcional en otras páginas, NO se aplica dentro de .tour-aside) */
 .tour-sidebar {
   position: sticky;
   top: 100px;
@@ -616,30 +652,6 @@ body::before {
 .tour-sidebar::-webkit-scrollbar { width: 6px; }
 .tour-sidebar::-webkit-scrollbar-track { background: var(--negro-2); }
 .tour-sidebar::-webkit-scrollbar-thumb { background: var(--rojo-vivo); border-radius: 3px; }
-.tour-sidebar__title {
-  font-family: var(--fuente-display);
-  font-size: 1.2rem;
-  font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--hueso);
-  margin-bottom: 1rem;
-  padding-bottom: .6rem;
-  border-bottom: 1px solid var(--linea);
-}
-.tour-sidebar__icarus { background: var(--negro-1); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
-.icarus-info { padding: 1.5rem; }
-.icarus-info__label { font-family: var(--fuente-sans); font-size: .55rem; letter-spacing: .22em; text-transform: uppercase; color: var(--bronce-claro); margin-bottom: 1rem; }
-.icarus-info__detail { font-family: var(--fuente-serif); font-size: .9rem; color: var(--plata-viva); line-height: 1.5; margin-bottom: 1rem; }
-.icarus-info__compilation { border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea); padding: 1rem 0; margin-bottom: 1rem; }
-.icarus-info__tag { display: inline-block; font-family: var(--fuente-sans); font-size: .5rem; letter-spacing: .2em; text-transform: uppercase; color: var(--negro-1); background: var(--rojo-vivo); padding: .2rem .7rem; border-radius: 2px; margin-bottom: .5rem; }
-.icarus-info__compilation p { font-family: var(--fuente-serif); font-size: .85rem; color: var(--hueso); margin-bottom: .2rem; }
-.icarus-info__track { color: var(--bronce); font-style: italic; }
-.icarus-info__about { font-family: var(--fuente-serif); font-size: .8rem; color: var(--bronce-claro); line-height: 1.5; font-style: italic; }
-.tour-sidebar__btn { width: 100%; text-align: center; }
-.tour-sidebar__macabra { margin-top: 2rem; }
-.tour-sidebar__macabra .tour-sidebar__fb { background: var(--negro-1); border-radius: 4px; overflow: hidden; }
-.tour-sidebar__macabra .tour-sidebar__fb iframe { display: block; border: 0; }
 
 /* [08] DISCOGRAPHY */
 .disc-grid { display: grid; gap: 4rem; }
